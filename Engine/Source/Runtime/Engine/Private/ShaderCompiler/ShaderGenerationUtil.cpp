@@ -144,6 +144,10 @@ void FShaderCompileUtilities::ApplyFetchEnvironment(FShaderMaterialPropertyDefin
 	//[Sketch-Pipeline][Add-Begin]添加光照模型
 	FETCH_COMPILE_BOOL(MATERIAL_SHADINGMODEL_SKETCH);
 	//[Sketch-Pipeline][Add-End]
+	
+	//[Toon-Pipeline][Add-Begin]添加光照模型
+	FETCH_COMPILE_BOOL(MATERIAL_SHADINGMODEL_TOON);
+	//[Toon-Pipeline][Add-End]
 	FETCH_COMPILE_BOOL(SINGLE_LAYER_WATER_SEPARATED_MAIN_LIGHT);
 
 	FETCH_COMPILE_BOOL(MATERIAL_FULLY_ROUGH);
@@ -1797,6 +1801,13 @@ static void DetermineUsedMaterialSlots(
 		SetStandardGBufferSlots(Slots, bWriteEmissive, bHasTangent, bHasVelocity, bHasStaticLighting, bIsStrataMaterial);
 	}
 	//[Sketch-Pipeline][Add-End]
+
+	//[Toon-Pipeline][Add-Begin]添加着色模型
+	if (Mat.MATERIAL_SHADINGMODEL_TOON)
+	{
+		SetStandardGBufferSlots(Slots, bWriteEmissive, bHasTangent, bHasVelocity, bHasStaticLighting, bIsStrataMaterial);
+	}
+	//[Toon-Pipeline][Add-End]
 	
 	// doesn't write to GBuffer
 	if (Mat.MATERIAL_SHADINGMODEL_THIN_TRANSLUCENT)

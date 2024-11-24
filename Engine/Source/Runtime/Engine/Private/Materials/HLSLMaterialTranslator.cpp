@@ -2149,6 +2149,13 @@ void FHLSLMaterialTranslator::GetMaterialEnvironment(EShaderPlatform InPlatform,
 			NumSetMaterials++;
 		}
 		//[Sketch-Pipeline][Add-End]
+		//[Toon-Pipeline][Add-Begin]添加光照模型
+		if (ShadingModels.HasShadingModel(MSM_Toon))
+		{
+			OutEnvironment.SetDefine(TEXT("MATERIAL_SHADINGMODEL_TOON"), TEXT("1"));
+			NumSetMaterials++;
+		}
+		//[Toon-Pipeline][Add-End]
 		if (ShadingModels.HasShadingModel(MSM_DefaultLit))
 		{
 			OutEnvironment.SetDefine(TEXT("MATERIAL_SHADINGMODEL_DEFAULT_LIT"), TEXT("1"));

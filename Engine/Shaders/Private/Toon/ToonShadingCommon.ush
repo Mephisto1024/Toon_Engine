@@ -1,0 +1,10 @@
+// Toon相关的一些通用代码尽量都往这里放
+
+//pragma once 表示文件只能包含一次
+#pragma once
+#include "../ShadingModels.ush"
+half ToonStep(float halfLambert, float smoothness = 0.001f, float threshold = 0.5f)
+{
+	smoothness = max(smoothness, 0.001f);
+	return smoothstep(threshold - smoothness, threshold + smoothness, halfLambert);
+}

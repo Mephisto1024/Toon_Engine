@@ -115,8 +115,11 @@ FString GetShadingModelString(EMaterialShadingModel ShadingModel)
 		case MSM_SingleLayerWater:	ShadingModelName = TEXT("MSM_SingleLayerWater"); break;
 		case MSM_ThinTranslucent:	ShadingModelName = TEXT("MSM_ThinTranslucent"); break;
 		//[Sketch-Pipeline][Add-Begin]添加光照模型
-	case MSM_Sketch:			ShadingModelName = TEXT("MSM_Sketch"); break;
+		case MSM_Sketch:			ShadingModelName = TEXT("MSM_Sketch"); break;
 		//[Sketch-Pipeline][Add-End]
+		//[Toon-Pipeline][Add-Begin]添加光照模型
+		case MSM_Toon:			ShadingModelName = TEXT("MSM_Toon"); break;
+		//[Toon-Pipeline][Add-End]
 		default: ShadingModelName = TEXT("Unknown"); break;
 	}
 	return ShadingModelName;
@@ -260,8 +263,11 @@ void UpdateMaterialShaderCompilingStats(const FMaterial* Material)
 		MSM_SingleLayerWater,
 		MSM_ThinTranslucent,
 		//[Sketch-Pipeline][Add-Begin]添加光照模型
-		MSM_Sketch
+		MSM_Sketch,
 		//[Sketch-Pipeline][Add-End]
+		//[Toon-Pipeline][Add-Begin]添加光照模型
+		MSM_Toon
+		//[Toon-Pipeline][Add-End]
 	}))
 	{
 		INC_DWORD_STAT_BY(STAT_ShaderCompiling_NumLitMaterialShaders, 1);

@@ -13,6 +13,7 @@
 #include "ShadingEnergyConservation.ush"
 #include "ParticipatingMediaCommon.ush"
 #include "ColorSpace.ush"
+#include "Toon/ToonShadingCommon.ush"
 
 #if SHADING_PATH_MOBILE
 #include "MobileGGX.ush"
@@ -346,6 +347,46 @@ FDirectLighting SketchBxDF(FGBufferData GBuffer, half3 N, half3 V, half3 L, floa
 	return DefaultLitBxDF(GBuffer, N, V, L, Falloff, NoL, AreaLight, Shadow);
 }
 //[Sketch-Pipeline][Add-End]
+
+//[Toon-Pipeline][Add-Begin]添加光照模型
+FDirectLighting ToonBxDF(FGBufferData GBuffer, half3 N, half3 V, half3 L, float Falloff, float NoL, FAreaLight AreaLight, FShadowTerms Shadow)
+{
+#if GBUFFER_HAS_TANGENT
+	half3 X = GBuffer.WorldTangent;
+	half3 Y = normalize(cross(N, X));
+#else
+	half3 X = 0;
+	half3 Y = 0;
+#endif
+	BxDFContext Context;
+	Init(Context, N, X, Y, V, L);
+	SphereMaxNoH(Context, AreaLight.SphereSinAlpha, true);
+	Context.NoV = saturate(abs(Context.NoV) + 0.00001);
+	float SpecularOffset = GBuffer.Specular;
+	SpecularOffset = (SpecularOffset-1)*-0.25;
+	float SpecularRange = saturate(GBuffer.Roughness-0.5);
+	float3 ShadowColor = 0;
+	ShadowColor = GBuffer.BaseColor * ShadowColor;
+	float offset = GBuffer.CustomData.a;
+	float SoftScatterStrength = 0;
+	offset = offset * 2 - 1;
+	half3 H = normalize(V + L);
+	float NoH = saturate(dot(N, H));
+	NoL=dot(N,L)*2-2;
+	half NoLOffset = NoL+saturate(GBuffer.CustomData.a)*4;
+	FDirectLighting Lighting;
+	Lighting.Diffuse = AreaLight.FalloffColor * ((smoothstep(-SpecularRange, SpecularRange, NoLOffset)) * Falloff) * Diffuse_Lambert(GBuffer.DiffuseColor) * 2.2;
+	float InScatter = pow(saturate(dot(L, -V)), 12) * lerp(3, .1f, 1);
+	float NormalContribution = saturate(dot(N, H));
+	float BackScatter = GBuffer.GBufferAO * NormalContribution / (PI * 2);
+	Lighting.Specular = ToonStep(SpecularRange, (saturate(D_GGX(SpecularOffset, NoH)))) * (AreaLight.FalloffColor * GBuffer.SpecularColor * Falloff * 8);
+	float3 TransmissionSoft = AreaLight.FalloffColor * (Falloff * lerp(BackScatter, 1, InScatter)) * ShadowColor * SoftScatterStrength;
+	float3 ShadowLightener = 0;
+	ShadowLightener = (saturate(smoothstep(0, 1, saturate(1 - NoLOffset))) * ShadowColor * 0.1);
+	Lighting.Transmission = (ShadowLightener + TransmissionSoft) * Falloff;
+	return Lighting;
+}
+//[Toon-Pipeline][Add-End]
 
 // Simple default lit model used by Lumen
 float3 SimpleShading( float3 DiffuseColor, float3 SpecularColor, float Roughness, float3 L, float3 V, half3 N )
@@ -993,6 +1034,10 @@ FDirectLighting IntegrateBxDF( FGBufferData GBuffer, half3 N, half3 V, half3 L, 
 		case SHADINGMODELID_SKETCH:
 		return SketchBxDF(GBuffer, N, V, L, Falloff, NoL, AreaLight, Shadow);
 		//[Sketch-Pipeline][Add-End]
+		//[Toon-Pipeline][Add-Begin]添加光照模型
+		case SHADINGMODELID_TOON:
+		return ToonBxDF(GBuffer, N, V, L, Falloff, NoL, AreaLight, Shadow);
+		//[Toon-Pipeline][Add-End]
 		default:
 			return (FDirectLighting)0;
 	}

@@ -35,7 +35,8 @@
 
 //[Sketch-Pipeline][Modify-Begin]添加光照模型
 #define SHADINGMODELID_SKETCH				13
-#define SHADINGMODELID_NUM					14
+#define SHADINGMODELID_TOON				14
+#define SHADINGMODELID_NUM					15
 #define SHADINGMODELID_MASK					0xF		// 4 bits reserved for ShadingModelID	
 //[Sketch-Pipeline][Modify-End]		
 
@@ -71,6 +72,9 @@ float3 GetShadingModelColor(uint ShadingModelID)
 	//[Sketch-Pipeline][Add-Begin]添加光照模型
 	else if (ShadingModelID == SHADINGMODELID_SKETCH) return float3(1.0f, 0.0f, 1.0f);
 	//[Sketch-Pipeline][Add-End]
+	//[Toon-Pipeline][Add-Begin]添加光照模型
+	else if (ShadingModelID == SHADINGMODELID_TOON) return float3(0.5f, 0.0f, 1.0f);
+	//[Toon-Pipeline][Add-End]
 	else return float3(1.0f, 1.0f, 1.0f); // White
 #else
 	switch(ShadingModelID)
@@ -91,6 +95,9 @@ float3 GetShadingModelColor(uint ShadingModelID)
 		//[Sketch-Pipeline][Add-Begin]添加光照模型
 		case SHADINGMODELID_SKETCH: return float3(1.0f, 0.0f, 1.0f);
 		//[Sketch-Pipeline][Add-End]
+		//[Toon-Pipeline][Add-Begin]添加光照模型
+		case SHADINGMODELID_TOON: return float3(0.5f, 0.0f, 1.0f);
+		//[Toon-Pipeline][Add-End]
 		default: return float3(1.0f, 1.0f, 1.0f); // White
 	}
 #endif
