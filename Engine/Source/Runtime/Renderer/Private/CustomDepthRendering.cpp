@@ -526,7 +526,13 @@ bool FCustomDepthPassMeshProcessor::TryAddMeshBatch(
 	PassDrawRenderState.SetDepthStencilState(GetCustomDepthStencilState(bWriteCustomStencilValues, PrimitiveSceneProxy->GetStencilWriteMask()));
 	if (bWriteCustomStencilValues)
 	{
-		const uint32 CustomDepthStencilValue = PrimitiveSceneProxy->GetCustomDepthStencilValue();
+		uint32 CustomDepthStencilValue = PrimitiveSceneProxy->GetCustomDepthStencilValue();
+		//[Toon-Pipeline][Add-Begine] 逐材质模板 step14
+		if(Material.GetMaterialStencilValue() > 0)
+		{
+			CustomDepthStencilValue = Material.GetMaterialStencilValue();
+		}
+		//[Toon-Pipeline][Add-End]
 		PassDrawRenderState.SetStencilRef(CustomDepthStencilValue);
 	}
 

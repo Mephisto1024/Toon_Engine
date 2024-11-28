@@ -1235,9 +1235,15 @@ void FMaterialInstanceParameterDetails::CreateBasePropertyOverrideWidgets(IDetai
 	TAttribute<bool> IsOverrideOutputTranslucentVelocityEnabled = TAttribute<bool>::Create(TAttribute<bool>::FGetter::CreateSP(this, &FMaterialInstanceParameterDetails::OverrideOutputTranslucentVelocityEnabled));
 	TAttribute<bool> IsOverrideDisplacementScalingEnabled = TAttribute<bool>::Create(TAttribute<bool>::FGetter::CreateSP(this, &FMaterialInstanceParameterDetails::OverrideDisplacementScalingEnabled)); 
 	TAttribute<bool> IsOverrideMaxWorldPositionOffsetDisplacementEnabled = TAttribute<bool>::Create(TAttribute<bool>::FGetter::CreateSP(this, &FMaterialInstanceParameterDetails::OverrideMaxWorldPositionOffsetDisplacementEnabled));
-
+	//[Toon-Pipeline][Add-Begine] 逐材质模板 step11-1
+	TAttribute<bool> IsOverrideMaterialStencilValueEnabled = TAttribute<bool>::Create(TAttribute<bool>::FGetter::CreateSP(this, &FMaterialInstanceParameterDetails::OverrideMaterialStencilValueEnabled));
+	//[Toon-Pipeline][Add-End]
+	
 	TSharedRef<IPropertyHandle> BasePropertyOverridePropery = DetailLayout.GetProperty("BasePropertyOverrides");
 	TSharedPtr<IPropertyHandle> OpacityClipMaskValueProperty = BasePropertyOverridePropery->GetChildHandle("OpacityMaskClipValue");
+	//[Toon-Pipeline][Add-Begine] 逐材质模板 step11-3
+	TSharedPtr<IPropertyHandle> MaterialStencilValueProperty = BasePropertyOverridePropery->GetChildHandle("MaterialStencilValue");
+	//[Toon-Pipeline][Add-End]
 	TSharedPtr<IPropertyHandle> BlendModeProperty = BasePropertyOverridePropery->GetChildHandle("BlendMode");
 	TSharedPtr<IPropertyHandle> ShadingModelProperty = BasePropertyOverridePropery->GetChildHandle("ShadingModel");
 	TSharedPtr<IPropertyHandle> TwoSidedProperty = BasePropertyOverridePropery->GetChildHandle("TwoSided");
@@ -1275,6 +1281,27 @@ void FMaterialInstanceParameterDetails::CreateBasePropertyOverrideWidgets(IDetai
 			.Visibility(TAttribute<EVisibility>::Create(TAttribute<EVisibility>::FGetter::CreateSP(this, &FMaterialInstanceParameterDetails::IsOverriddenAndVisible, IsOverrideOpacityClipMaskValueEnabled)))
 			.OverrideResetToDefault(ResetOpacityClipMaskValuePropertyOverride);
 	}
+	//[Toon-Pipeline][Add-Begine] 逐材质模板 step 11-4
+	{
+		FIsResetToDefaultVisible IsMaterialStencilValuePropertyResetVisible = FIsResetToDefaultVisible::CreateLambda([this](TSharedPtr<IPropertyHandle> InHandle) {
+			return MaterialEditorInstance->Parent != nullptr ? MaterialEditorInstance->BasePropertyOverrides.MaterialStencilValue != MaterialEditorInstance->Parent->GetMaterialStencilValue() : false;
+			});
+		FResetToDefaultHandler ResetMaterialStencilValuePropertyHandler = FResetToDefaultHandler::CreateLambda([this](TSharedPtr<IPropertyHandle> InHandle) {
+			if (MaterialEditorInstance->Parent != nullptr)
+			{
+				MaterialEditorInstance->BasePropertyOverrides.MaterialStencilValue = MaterialEditorInstance->Parent->GetMaterialStencilValue();
+			}
+			});
+		FResetToDefaultOverride ResetMaterialStencilValuePropertyOverride = FResetToDefaultOverride::Create(IsMaterialStencilValuePropertyResetVisible, ResetMaterialStencilValuePropertyHandler);
+		IDetailPropertyRow& MaterialStencilValuePropertyRow = BasePropertyOverrideGroup.AddPropertyRow(MaterialStencilValueProperty.ToSharedRef());
+		MaterialStencilValuePropertyRow
+			.DisplayName(MaterialStencilValueProperty->GetPropertyDisplayName())
+			.ToolTip(bStaticParametersOverrideDisabled ? ParameterDisabledToolTipString : MaterialStencilValueProperty->GetToolTipText())
+			.EditCondition(IsOverrideMaterialStencilValueEnabled, FOnBooleanValueChanged::CreateSP(this, &FMaterialInstanceParameterDetails::OnOverrideMaterialStencilValueChanged))
+			.Visibility(TAttribute<EVisibility>::Create(TAttribute<EVisibility>::FGetter::CreateSP(this, &FMaterialInstanceParameterDetails::IsOverriddenAndVisible, IsOverrideMaterialStencilValueEnabled)))
+			.OverrideResetToDefault(ResetMaterialStencilValuePropertyOverride);
+	}
+	//[Toon-Pipeline][Add-End]
 	{
 		FIsResetToDefaultVisible IsBlendModePropertyResetVisible = FIsResetToDefaultVisible::CreateLambda([this](TSharedPtr<IPropertyHandle> InHandle) {
 			return MaterialEditorInstance->Parent != nullptr ? MaterialEditorInstance->BasePropertyOverrides.BlendMode != MaterialEditorInstance->Parent->GetBlendMode() : false;
@@ -1469,6 +1496,13 @@ bool FMaterialInstanceParameterDetails::OverrideOpacityClipMaskValueEnabled() co
 	return MaterialEditorInstance->BasePropertyOverrides.bOverride_OpacityMaskClipValue;
 }
 
+//[Toon-Pipeline][Add-Begine] 逐材质模板 step11-2
+bool FMaterialInstanceParameterDetails::OverrideMaterialStencilValueEnabled() const
+{
+	return MaterialEditorInstance->BasePropertyOverrides.bOverride_MaterialStencilValue;
+}
+//[Toon-Pipeline][Add-End]
+
 bool FMaterialInstanceParameterDetails::OverrideBlendModeEnabled() const
 {
 	return MaterialEditorInstance->BasePropertyOverrides.bOverride_BlendMode;
@@ -1531,6 +1565,19 @@ void FMaterialInstanceParameterDetails::OnOverrideOpacityClipMaskValueChanged(bo
 	MaterialEditorInstance->PostEditChange();
 	FEditorSupportDelegates::RedrawAllViewports.Broadcast();
 }
+
+//[Toon-Pipeline][Add-Begine] 逐材质模板 step11-5
+void FMaterialInstanceParameterDetails::OnOverrideMaterialStencilValueChanged(bool NewValue)
+{
+	if (DoesSourceMaterialInstanceDisallowStaticParameterPermutation(MaterialEditorInstance, NewValue))
+	{
+		return;
+	}
+	MaterialEditorInstance->BasePropertyOverrides.bOverride_MaterialStencilValue = NewValue;
+	MaterialEditorInstance->PostEditChange();
+	FEditorSupportDelegates::RedrawAllViewports.Broadcast();
+}
+//[Toon-Pipeline][Add-End]
 
 void FMaterialInstanceParameterDetails::OnOverrideBlendModeChanged(bool NewValue)
 {

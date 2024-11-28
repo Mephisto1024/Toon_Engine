@@ -284,6 +284,11 @@ public:
 	UPROPERTY()
 	uint8 bIncludedInBaseGame : 1;
 
+	//[Toon-Pipeline][Add-Begine] 逐材质模板
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "MFST_Material")
+	uint8 MaterialStencilValue = 0;
+	//[Toon-Pipeline][Add-End]
+	
 	/* -------------------------- */
 
 	/** A fence to track when the primitive is no longer used as a parent */
@@ -895,6 +900,9 @@ public:
 	/**
 		Access to overridable properties of the base material.
 	*/
+	//[Toon-Pipeline][Add-Begine] 逐材质模板 step1
+	ENGINE_API virtual uint8 GetMaterialStencilValue() const;
+	//[Toon-Pipeline][Add-End]
 	ENGINE_API virtual float GetOpacityMaskClipValue() const;
 	ENGINE_API virtual bool GetCastDynamicShadowAsMasked() const;
 	UFUNCTION(BlueprintCallable, Category = "Rendering|Material")

@@ -914,6 +914,12 @@ void UMaterialEditorInstanceConstant::CopyBasePropertiesFromParent()
 	{
 		BasePropertyOverrides.OpacityMaskClipValue = SourceInstance->GetOpacityMaskClipValue();
 	}
+	//[Toon-Pipeline][Add-Begine] 逐材质模板 step9-2
+	if(!BasePropertyOverrides.bOverride_MaterialStencilValue)
+	{
+		BasePropertyOverrides.MaterialStencilValue = SourceInstance->GetMaterialStencilValue();
+	}
+	//[Toon-Pipeline][Add-End]
 	if (!BasePropertyOverrides.bOverride_BlendMode)
 	{
 		BasePropertyOverrides.BlendMode = SourceInstance->GetBlendMode();

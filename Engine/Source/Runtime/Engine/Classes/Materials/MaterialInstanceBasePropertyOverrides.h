@@ -17,6 +17,11 @@ struct FMaterialInstanceBasePropertyOverrides
 	UPROPERTY(EditAnywhere, Category = Material)
 	uint8 bOverride_OpacityMaskClipValue : 1;
 
+	//[Toon-Pipeline][Add-Begine] 逐材质模板 step7-1
+	UPROPERTY(EditAnywhere, Category = Material)
+	uint8 bOverride_MaterialStencilValue : 1;
+	//[Toon-Pipeline][Add-End]
+	
 	/** Enables override of the blend mode. */
 	UPROPERTY(EditAnywhere, Category = Material)
 	uint8 bOverride_BlendMode : 1;
@@ -72,7 +77,7 @@ struct FMaterialInstanceBasePropertyOverrides
 	/** Whether the material should output velocity even though it has a translucent blend mode. */
 	UPROPERTY(EditAnywhere, Category = Material, meta = (editcondition = "bOverride_OutputTranslucentVelocity"))
 	uint8 bOutputTranslucentVelocity : 1;
-
+	
 	/** The blend mode */
 	UPROPERTY(EditAnywhere, Category = Material, meta = (editcondition = "bOverride_BlendMode"))
 	TEnumAsByte<EBlendMode> BlendMode;
@@ -85,6 +90,11 @@ struct FMaterialInstanceBasePropertyOverrides
 	UPROPERTY(EditAnywhere, Category = Material, meta = (editcondition = "bOverride_OpacityMaskClipValue", NoSpinbox = true))
 	float OpacityMaskClipValue;
 
+	//[Toon-Pipeline][Add-Begine] 逐材质模板 step7-2
+	UPROPERTY(EditAnywhere, Category = Material, meta = (editcondition = "bOverride_MaterialStencilValue"))
+	uint8 MaterialStencilValue;
+	//[Toon-Pipeline][Add-End]
+	
 	UPROPERTY(EditAnywhere, Category = Material, meta = (editcondition = "bOverride_DisplacementScaling"))
 	FDisplacementScaling DisplacementScaling;
 

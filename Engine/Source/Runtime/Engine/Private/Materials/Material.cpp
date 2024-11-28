@@ -1364,6 +1364,13 @@ void UMaterial::RecacheUniformExpressions(bool bRecreateUniformBuffer) const
 #endif
 }
 
+//[Toon-Pipeline][Add-Begine] 逐材质模板 step4
+uint8 UMaterial::GetMaterialStencilValue() const
+{
+	return Super::GetMaterialStencilValue();
+}
+//[Toon-Pipeline][Add-End]
+
 bool UMaterial::GetUsageByFlag(EMaterialUsage Usage) const
 {
 	bool UsageValue = false;

@@ -108,6 +108,9 @@ private:
 	EVisibility IsOverriddenAndVisible(TAttribute<bool> IsOverridden) const;
 
 	bool OverrideOpacityClipMaskValueEnabled() const;
+	//[Toon-Pipeline][Add-Begine] 逐材质模板 step10-1
+	bool OverrideMaterialStencilValueEnabled() const;
+	//[Toon-Pipeline][Add-End]
 	bool OverrideBlendModeEnabled() const;
 	bool OverrideShadingModelEnabled() const;
 	bool OverrideTwoSidedEnabled() const;
@@ -117,6 +120,9 @@ private:
 	bool OverrideDisplacementScalingEnabled() const;
 	bool OverrideMaxWorldPositionOffsetDisplacementEnabled() const;
 	void OnOverrideOpacityClipMaskValueChanged(bool NewValue);
+	//[Toon-Pipeline][Add-Begine] 逐材质模板 step10-2
+	void OnOverrideMaterialStencilValueChanged(bool NewValue);
+	//[Toon-Pipeline][Add-End]
 	void OnOverrideBlendModeChanged(bool NewValue);
 	void OnOverrideShadingModelChanged(bool NewValue);
 	void OnOverrideTwoSidedChanged(bool NewValue);

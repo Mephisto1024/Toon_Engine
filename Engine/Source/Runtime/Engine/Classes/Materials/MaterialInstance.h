@@ -793,6 +793,9 @@ public:
 	ENGINE_API virtual void ForceRecompileForRendering() override;
 #endif // WITH_EDITOR
 
+	//[Toon-Pipeline][Add-Begine] 逐材质模板 step5
+	ENGINE_API virtual uint8 GetMaterialStencilValue() const override;
+	//[Toon-Pipeline][Add-End]
 	ENGINE_API virtual float GetOpacityMaskClipValue() const override;
 	ENGINE_API virtual bool GetCastDynamicShadowAsMasked() const override;
 	ENGINE_API virtual EBlendMode GetBlendMode() const override;

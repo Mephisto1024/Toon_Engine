@@ -1821,6 +1821,14 @@ float FMaterialResource::GetOpacityMaskClipValue() const
 	return MaterialInstance ? MaterialInstance->GetOpacityMaskClipValue() : Material->GetOpacityMaskClipValue();
 }
 
+//[Toon-Pipeline][Add-Begine] 逐材质模板 step13
+uint8 FMaterialResource::GetMaterialStencilValue() const
+{
+	return MaterialInstance ? MaterialInstance->GetMaterialStencilValue() : Material->GetMaterialStencilValue();
+}
+//[Toon-Pipeline][Add-End]
+
+
 bool FMaterialResource::GetCastDynamicShadowAsMasked() const
 {
 	return MaterialInstance ? MaterialInstance->GetCastDynamicShadowAsMasked() : Material->GetCastDynamicShadowAsMasked();
@@ -4667,6 +4675,9 @@ void DoMaterialAttributeReorder(FExpressionInput* Input, const FPackageFileVersi
 
 FMaterialInstanceBasePropertyOverrides::FMaterialInstanceBasePropertyOverrides()
 	:bOverride_OpacityMaskClipValue(false)
+	 //[Toon-Pipeline][Add-Begine] 逐材质模板 step8-1
+	,bOverride_MaterialStencilValue(false)
+	 //[Toon-Pipeline][Add-End]
 	,bOverride_BlendMode(false)
 	,bOverride_ShadingModel(false)
 	,bOverride_DitheredLODTransition(false)
@@ -4684,6 +4695,9 @@ FMaterialInstanceBasePropertyOverrides::FMaterialInstanceBasePropertyOverrides()
 	,BlendMode(BLEND_Opaque)
 	,ShadingModel(MSM_DefaultLit)
 	,OpacityMaskClipValue(.333333f)
+	 //[Toon-Pipeline][Add-Begine] 逐材质模板 step8-2
+	,MaterialStencilValue(0)
+	 //[Toon-Pipeline][Add-End]
 	,DisplacementScaling()
 	,MaxWorldPositionOffsetDisplacement(0.0f)
 {
@@ -4701,6 +4715,9 @@ bool FMaterialInstanceBasePropertyOverrides::operator==(const FMaterialInstanceB
 		bOverride_DisplacementScaling == Other.bOverride_DisplacementScaling &&
 		bOverride_MaxWorldPositionOffsetDisplacement == Other.bOverride_MaxWorldPositionOffsetDisplacement &&
 		OpacityMaskClipValue == Other.OpacityMaskClipValue &&
+		//[Toon-Pipeline][Add-Begine] 逐材质模板 step8-3
+		MaterialStencilValue == Other.MaterialStencilValue &&
+		//[Toon-Pipeline][Add-End]
 		BlendMode == Other.BlendMode &&
 		ShadingModel == Other.ShadingModel &&
 		TwoSided == Other.TwoSided &&

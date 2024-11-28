@@ -2068,6 +2068,13 @@ void UMaterialInstance::ForceRecompileForRendering()
 }
 #endif // WITH_EDITOR
 
+//[Toon-Pipeline][Add-Begine] 逐材质模板 step6-1
+uint8 UMaterialInstance::GetMaterialStencilValue() const
+{
+	return Super::GetMaterialStencilValue();
+}
+//[Toon-Pipeline][Add-End]
+
 void UMaterialInstance::InitStaticPermutation(EMaterialShaderPrecompileMode PrecompileMode)
 {
 	UpdateOverridableBaseProperties();
@@ -2119,6 +2126,9 @@ void UMaterialInstance::UpdateOverridableBaseProperties()
 		bOutputTranslucentVelocity = false;
 		DisplacementScaling = FDisplacementScaling();
 		MaxWorldPositionOffsetDisplacement = 0.0f;
+		//[Toon-Pipeline][Add-Begine] 逐材质模板 step6-3
+		MaterialStencilValue = 0;
+		//[Toon-Pipeline][Add-End]
 		return;
 	}
 
@@ -2132,6 +2142,18 @@ void UMaterialInstance::UpdateOverridableBaseProperties()
 		BasePropertyOverrides.OpacityMaskClipValue = OpacityMaskClipValue;
 	}
 
+	//[Toon-Pipeline][Add-Begine] 逐材质模板 step6-4
+	if(BasePropertyOverrides.bOverride_MaterialStencilValue)
+	{
+		MaterialStencilValue = BasePropertyOverrides.MaterialStencilValue;
+	}
+	else
+	{
+		MaterialStencilValue = Parent->GetMaterialStencilValue();
+		BasePropertyOverrides.MaterialStencilValue = MaterialStencilValue;
+	}
+	//[Toon-Pipeline][Add-End]
+	
 	if ( BasePropertyOverrides.bOverride_CastDynamicShadowAsMasked )
 	{
 		bCastDynamicShadowAsMasked = BasePropertyOverrides.bCastDynamicShadowAsMasked;
@@ -4478,6 +4500,9 @@ bool UMaterialInstance::HasOverridenBaseProperties()const
 	const UMaterial* Material = GetMaterial_Concurrent();
 	if (Parent && Material && Material->bUsedAsSpecialEngineMaterial == false &&
 		((FMath::Abs(GetOpacityMaskClipValue() - Parent->GetOpacityMaskClipValue()) > UE_SMALL_NUMBER) ||
+		//[Toon-Pipeline][Add-Begine] 逐材质模板 step6-2
+		(GetMaterialStencilValue() != Parent->GetMaterialStencilValue()) ||
+		//[Toon-Pipeline][Add-End]
 		(GetBlendMode() != Parent->GetBlendMode()) ||
 		(GetShadingModels() != Parent->GetShadingModels()) ||
 		(IsTwoSided() != Parent->IsTwoSided()) ||

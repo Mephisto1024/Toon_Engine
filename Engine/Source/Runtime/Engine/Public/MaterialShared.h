@@ -1924,6 +1924,9 @@ public:
 	virtual bool IsShadingModelFromMaterialExpression() const = 0;
 	virtual enum ETranslucencyLightingMode GetTranslucencyLightingMode() const { return TLM_VolumetricNonDirectional; };
 	virtual float GetOpacityMaskClipValue() const = 0;
+	//[Toon-Pipeline][Add-Begine] 逐材质模板 step12-1
+	virtual uint8 GetMaterialStencilValue() const {return 0;}
+	//[Toon-Pipeline][Add-End]
 	virtual bool GetCastDynamicShadowAsMasked() const = 0;
 	virtual bool IsDistorted() const { return false; };
 	virtual ERefractionCoverageMode GetRefractionCoverageMode() const { return RCM_CoverageIgnored; }
@@ -2670,6 +2673,9 @@ public:
 	ENGINE_API virtual bool IsShadingModelFromMaterialExpression() const override;
 	ENGINE_API virtual enum ETranslucencyLightingMode GetTranslucencyLightingMode() const override;
 	ENGINE_API virtual float GetOpacityMaskClipValue() const override;
+	//[Toon-Pipeline][Add-Begine] 逐材质模板 step12-2
+	ENGINE_API virtual uint8 GetMaterialStencilValue() const override;
+	//[Toon-Pipeline][Add-End]
 	ENGINE_API virtual bool GetCastDynamicShadowAsMasked() const override;
 	ENGINE_API virtual bool IsDistorted() const override;
 	ENGINE_API virtual ERefractionCoverageMode GetRefractionCoverageMode() const override;

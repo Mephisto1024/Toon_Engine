@@ -6,6 +6,7 @@
 
 #include "Materials/MaterialInterface.h"
 
+#include "AssetTypeCategories.h"
 #include "MeshUVChannelInfo.h"
 #include "RenderingThread.h"
 #include "DataDrivenShaderPlatformInfo.h"
@@ -1160,6 +1161,13 @@ bool UMaterialInterface::GetRefractionSettings(float& OutBiasValue) const
 {
 	return false;
 }
+
+//[Toon-Pipeline][Add-Begine] 逐材质模板 step2
+uint8 UMaterialInterface::GetMaterialStencilValue() const
+{
+	return MaterialStencilValue;
+}
+//[Toon-Pipeline][Add-End]
 
 #if WITH_EDITOR
 bool UMaterialInterface::GetParameterDesc(const FHashedMaterialParameterInfo& ParameterInfo, FString& OutDesc) const
