@@ -382,6 +382,15 @@ void ReflectionEnvironmentSkyLighting(
 
 		float3 SkyLighting = CloudVolumetricAOShadow * SkyLightDiffuse(GBuffer, AmbientOcclusion, BufferUV, ScreenPosition, BentNormal, DiffuseColor);
 
+		//[Toon-Pipeline][Add-Begine] 消除环境光 step1
+		if (GBuffer.ShadingModelID == SHADINGMODELID_TOON)
+		{
+			SkyLighting = float3(0.0,0.0,0.0);
+			//float3 SubsurfaceColor = ExtractSubsurfaceColor(GBuffer);
+			//SkyLighting = SubsurfaceColor.rgb * DiffuseColor;
+		}
+		//[Toon-Pipeline][Add-End]
+		
 		FLightAccumulator LightAccumulator = (FLightAccumulator)0;
 		const bool bNeedsSeparateSubsurfaceLightAccumulation = UseSubsurfaceProfile(ShadingModelID);
 		LightAccumulator_Add(LightAccumulator, SkyLighting, SkyLighting, 1.0f, bNeedsSeparateSubsurfaceLightAccumulation);
