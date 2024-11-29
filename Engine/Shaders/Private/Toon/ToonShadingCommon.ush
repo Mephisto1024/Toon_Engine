@@ -2,9 +2,55 @@
 
 //pragma once 表示文件只能包含一次
 #pragma once
+#define STENCIL_FACE 2
+#define STENCIL_EYE 4
+#define STENCIL_HAIR 8
 #include "../ShadingModels.ush"
 half ToonStep(float halfLambert, float smoothness = 0.001f, float threshold = 0.5f)
 {
 	smoothness = max(smoothness, 0.001f);
 	return smoothstep(threshold - smoothness, threshold + smoothness, halfLambert);
 }
+
+float3 GetMainLightDirection()
+{
+	return View.AtmosphereLightDirection[0].xyz;
+}
+
+bool IsMainLight(FDeferredLightData LightData)
+{
+	return !LightData.bRadialLight && all(LightData.Direction == GetMainLightDirection());
+}
+
+float GetHairShadow(FGBufferData GBuffer, FDeferredLightData LightData, float2 ScreenUV)
+{
+	float Shadow = 1.0f;
+	
+	if (!IsMainLight(LightData))
+	{
+		return Shadow;
+	}
+	
+	float k = 10.0f;
+	// 屏幕空间LightDirection
+	// View.TranslatedWorldToCameraView用于将世界空间变换到屏幕空间
+	float3 LightDirVS = mul(LightData.Direction, (float3x3)(View.TranslatedWorldToCameraView));
+	// 翻转LightDirVS的y方向，不然Offset上下会反，可能会出现OpenGL和DirectX不一致的情况，不过到时候遇到再改
+	LightDirVS.y = -LightDirVS.y;
+	// 修正摄像机距离对偏移距离的影响
+	LightDirVS *= (100.0f / CalcSceneDepth(ScreenUV));
+	// View.BufferSizeAndInvSize.xy是屏幕分辨率；View.BufferSizeAndInvSize.xy是屏幕分辨率的倒数
+	float2 Offset = LightDirVS.xy * k * View.BufferSizeAndInvSize.zw;
+	float2 OffsetedUV = saturate(ScreenUV + Offset);
+	
+	FGBufferData OffsetedGBuffer = GetGBufferData(OffsetedUV);
+	
+	if (OffsetedGBuffer.CustomStencil == STENCIL_HAIR
+		&&(GBuffer.CustomStencil == STENCIL_FACE || GBuffer.CustomStencil ==STENCIL_EYE)
+		&& OffsetedGBuffer.Depth < GBuffer.Depth)
+	{
+		Shadow = 0.0f;
+	}
+	
+	return Shadow;
+};

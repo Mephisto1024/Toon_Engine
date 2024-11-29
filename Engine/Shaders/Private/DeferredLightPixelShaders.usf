@@ -50,6 +50,9 @@
 
 #include "Strata/StrataEvaluation.ush"
 #include "Strata/StrataDeferredLighting.ush"
+//[Toon-Pipeline][Add-Begine] 添加头发投影 step1
+#include "Toon/ToonShadingCommon.ush"
+//[Toon-Pipeline][Add-End]
 
 #if USE_VIRTUAL_SHADOW_MAP_MASK
 #include "VirtualShadowMaps/VirtualShadowMapMaskBitsCommon.ush"
@@ -336,6 +339,13 @@ void DeferredLightPixelMain(
 		float SurfaceShadow = 1.0f;
 		
 		float4 LightAttenuation = GetLightAttenuationFromShadow(InputParams, SceneDepth);
+		//[Toon-Pipeline][Add-Begine] 添加头发投影 step2
+		if(ScreenSpaceData.GBuffer.ShadingModelID == SHADINGMODELID_TOON)
+		{
+			float HairShadow = GetHairShadow(ScreenSpaceData.GBuffer,  LightData, InputParams.ScreenUV);
+			LightAttenuation = LightAttenuation * HairShadow;
+		}
+		//[Toon-Pipeline][Add-End]
 		float4 Radiance = GetDynamicLighting(DerivedParams.TranslatedWorldPosition, DerivedParams.CameraVector, ScreenSpaceData.GBuffer, ScreenSpaceData.AmbientOcclusion, ScreenSpaceData.GBuffer.ShadingModelID, LightData, LightAttenuation, Dither, uint2(InputParams.PixelPos), SurfaceShadow);
 
 		OutColor += Radiance;
