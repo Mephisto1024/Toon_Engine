@@ -343,9 +343,12 @@ void DeferredLightPixelMain(
 		if(ScreenSpaceData.GBuffer.ShadingModelID == SHADINGMODELID_TOON)
 		{
 			float HairShadow = GetHairShadow(ScreenSpaceData.GBuffer,  LightData, InputParams.ScreenUV);
-			LightAttenuation = LightAttenuation * HairShadow;
+			//LightAttenuation = LightAttenuation * HairShadow;
+			//去除头发以外的阴影
+			LightAttenuation = HairShadow;
 		}
 		//[Toon-Pipeline][Add-End]
+
 		float4 Radiance = GetDynamicLighting(DerivedParams.TranslatedWorldPosition, DerivedParams.CameraVector, ScreenSpaceData.GBuffer, ScreenSpaceData.AmbientOcclusion, ScreenSpaceData.GBuffer.ShadingModelID, LightData, LightAttenuation, Dither, uint2(InputParams.PixelPos), SurfaceShadow);
 
 		OutColor += Radiance;
