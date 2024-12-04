@@ -361,15 +361,18 @@ FDirectLighting ToonBxDF(FGBufferData GBuffer, half3 N, half3 V, half3 L, float 
 	BxDFContext Context;
 	Init(Context, N, X, Y, V, L);
 	SphereMaxNoH(Context, AreaLight.SphereSinAlpha, true);
+	//GetData
+	float3 LightColor = AreaLight.FalloffColor * Falloff;
+	float3 BrightColor = GBuffer.BaseColor;
+	float3 ShadowColor = GBuffer.BaseColor * 0.5;
+	//Calc
+	float ShadowMask = smoothstep(0.45, 0.5, NoL);
+	//Lighting
+	FDirectLighting Lighting;
 	
-	FDirectLighting Lighting =
-	{
-		float3(0.0,0.0,0.0),
-		float3(0.0,0.0,0.0),
-		float3(0.0,0.0,0.0)
-	};
-	Lighting.Diffuse = AreaLight.FalloffColor * ((smoothstep(0.45, 0.5, NoL)) * Falloff) * Diffuse_Lambert(GBuffer.DiffuseColor);
-	
+	Lighting.Diffuse = LightColor * Diffuse_Lambert(lerp(ShadowColor,BrightColor,ShadowMask));
+	Lighting.Specular = 0;
+	Lighting.Transmission = 0;
 	return Lighting;
 }
 //[Toon-Pipeline][Add-End]
