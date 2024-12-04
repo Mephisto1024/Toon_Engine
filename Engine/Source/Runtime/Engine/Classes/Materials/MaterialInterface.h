@@ -284,9 +284,18 @@ public:
 	UPROPERTY()
 	uint8 bIncludedInBaseGame : 1;
 
-	//[Toon-Pipeline][Add-Begine] 逐材质模板
+	//[Toon-Pipeline][Add-Begine] 逐材质模板 step1
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "MFST_Material")
 	uint8 MaterialStencilValue = 0;
+	//[Toon-Pipeline][Add-End]
+
+	//[Toon-Pipeline][Add-Begine] 增加描边Pass step1-1
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "MFST_Material")
+	bool bOutlined = false;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "MFST_Material")
+	float OutlineSize = 0.1f;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "MFST_Material")
+	FLinearColor OutlineColor = FLinearColor::Black;
 	//[Toon-Pipeline][Add-End]
 	
 	/* -------------------------- */
@@ -902,6 +911,11 @@ public:
 	*/
 	//[Toon-Pipeline][Add-Begine] 逐材质模板 step1
 	ENGINE_API virtual uint8 GetMaterialStencilValue() const;
+	//[Toon-Pipeline][Add-End]
+	//[Toon-Pipeline][Add-Begine] 增加描边Pass step1-2
+	ENGINE_API virtual bool IsOutLined() const;
+	ENGINE_API virtual float GetOutlineSize() const;
+	ENGINE_API virtual FLinearColor GetOutlineColor() const;
 	//[Toon-Pipeline][Add-End]
 	ENGINE_API virtual float GetOpacityMaskClipValue() const;
 	ENGINE_API virtual bool GetCastDynamicShadowAsMasked() const;

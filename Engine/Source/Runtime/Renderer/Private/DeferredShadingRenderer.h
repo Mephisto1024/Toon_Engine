@@ -359,6 +359,10 @@ public:
 	 */
 	void DebugLightGrid(FRDGBuilder& GraphBuilder, FSceneTextures& SceneTextures, bool bNeedLightGrid);
 
+	//[Toon-Pipeline][Add-Begin] 增加描边Pass step20
+	void RenderOutlinePass(FRDGBuilder& GraphBuilder,FSceneTextures& SceneTextures);
+	//[Toon-Pipeline][Add-End]
+	
 	void RenderBasePass(
 		FRDGBuilder& GraphBuilder,
 		FSceneTextures& SceneTextures,

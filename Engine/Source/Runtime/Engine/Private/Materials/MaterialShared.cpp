@@ -1828,7 +1828,20 @@ uint8 FMaterialResource::GetMaterialStencilValue() const
 }
 //[Toon-Pipeline][Add-End]
 
-
+//[Toon-Pipeline][Add-Begin] 增加描边Pass step14
+bool FMaterialResource::IsOutlined() const
+{
+	return MaterialInstance ? MaterialInstance->IsOutLined() : Material->IsOutLined();
+}
+float FMaterialResource::GetOutlineSize() const
+{
+	return MaterialInstance ? MaterialInstance->GetOutlineSize() : Material->GetOutlineSize();
+}
+FLinearColor FMaterialResource::GetOutlineColor() const
+{
+	return MaterialInstance ? MaterialInstance->GetOutlineColor() : Material->GetOutlineColor();
+}
+//[Toon-Pipeline][Add-End]
 bool FMaterialResource::GetCastDynamicShadowAsMasked() const
 {
 	return MaterialInstance ? MaterialInstance->GetCastDynamicShadowAsMasked() : Material->GetCastDynamicShadowAsMasked();
@@ -4678,6 +4691,11 @@ FMaterialInstanceBasePropertyOverrides::FMaterialInstanceBasePropertyOverrides()
 	 //[Toon-Pipeline][Add-Begine] 逐材质模板 step8-1
 	,bOverride_MaterialStencilValue(false)
 	 //[Toon-Pipeline][Add-End]
+	 //[Toon-Pipeline][Add-Begin] 增加描边Pass step9-1
+	,bOverride_Outlined(false)
+	,bOverride_OutlineSize(false)
+	,bOverride_OutlineColor(false)
+	 //[Toon-Pipeline][Add-End]
 	,bOverride_BlendMode(false)
 	,bOverride_ShadingModel(false)
 	,bOverride_DitheredLODTransition(false)
@@ -4698,6 +4716,11 @@ FMaterialInstanceBasePropertyOverrides::FMaterialInstanceBasePropertyOverrides()
 	 //[Toon-Pipeline][Add-Begine] 逐材质模板 step8-2
 	,MaterialStencilValue(0)
 	 //[Toon-Pipeline][Add-End]
+	 //[Toon-Pipeline][Add-Begin] 增加描边Pass step9-2
+	,bOutlined(false)
+	,OutlineSize(0.0f)
+	,OutlineColor(FLinearColor::Black)
+	 //[Toon-Pipeline][Add-End]
 	,DisplacementScaling()
 	,MaxWorldPositionOffsetDisplacement(0.0f)
 {
@@ -4717,6 +4740,11 @@ bool FMaterialInstanceBasePropertyOverrides::operator==(const FMaterialInstanceB
 		OpacityMaskClipValue == Other.OpacityMaskClipValue &&
 		//[Toon-Pipeline][Add-Begine] 逐材质模板 step8-3
 		MaterialStencilValue == Other.MaterialStencilValue &&
+		//[Toon-Pipeline][Add-End]
+		//[Toon-Pipeline][Add-Begin] 增加描边Pass step9-3
+		bOutlined == Other.bOutlined &&
+		OutlineSize == Other.OutlineSize &&
+		OutlineColor == Other.OutlineColor &&
 		//[Toon-Pipeline][Add-End]
 		BlendMode == Other.BlendMode &&
 		ShadingModel == Other.ShadingModel &&
@@ -5162,6 +5190,9 @@ FMaterialShaderParameters::FMaterialShaderParameters(const FMaterial* InMaterial
 	// Make sure to zero-initialize so we get consistent hashes
 	FMemory::Memzero(*this);
 
+	//[Toon-Pipeline][Add-Begin] 增加描边Pass step16
+	bOutlined = InMaterial->IsOutlined();
+	//[Toon-Pipeline][Add-End]
 	MaterialDomain = InMaterial->GetMaterialDomain();
 	ShadingModels = InMaterial->GetShadingModels();
 	BlendMode = InMaterial->GetBlendMode();

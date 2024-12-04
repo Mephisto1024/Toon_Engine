@@ -276,8 +276,11 @@ class FPSOCollectorCreateManager
 {
 public:
 
-	constexpr static uint32 MaxPSOCollectorCount = 34;
-
+	//constexpr static uint32 MaxPSOCollectorCount = 34;
+	//[Toon-Pipeline][Add-Begin] 增加描边Pass step18
+	constexpr static uint32 MaxPSOCollectorCount = 34 + 1;
+	//[Toon-Pipeline][Add-End]
+	
 	static PSOCollectorCreateFunction GetCreateFunction(EShadingPath ShadingPath, uint32 Index)
 	{
 		check(Index < MaxPSOCollectorCount);

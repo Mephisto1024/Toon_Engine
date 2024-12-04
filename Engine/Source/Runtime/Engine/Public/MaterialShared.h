@@ -1927,6 +1927,11 @@ public:
 	//[Toon-Pipeline][Add-Begine] 逐材质模板 step12-1
 	virtual uint8 GetMaterialStencilValue() const {return 0;}
 	//[Toon-Pipeline][Add-End]
+	//[Toon-Pipeline][Add-Begin] 增加描边Pass step13-1
+	virtual bool IsOutlined() const {return false;}
+	virtual float GetOutlineSize() const {return 0.0f;}
+	virtual FLinearColor GetOutlineColor() const {return FLinearColor::Black;}
+	//[Toon-Pipeline][Add-End]
 	virtual bool GetCastDynamicShadowAsMasked() const = 0;
 	virtual bool IsDistorted() const { return false; };
 	virtual ERefractionCoverageMode GetRefractionCoverageMode() const { return RCM_CoverageIgnored; }
@@ -2676,6 +2681,11 @@ public:
 	//[Toon-Pipeline][Add-Begine] 逐材质模板 step12-2
 	ENGINE_API virtual uint8 GetMaterialStencilValue() const override;
 	//[Toon-Pipeline][Add-End]
+	//[Toon-Pipeline][Add-Begin] 增加描边Pass step13-2
+	ENGINE_API virtual bool IsOutlined() const override;
+	ENGINE_API virtual float GetOutlineSize() const override;
+	ENGINE_API virtual FLinearColor GetOutlineColor() const override;
+	//[Toon-Pipeline][Add-End]
 	ENGINE_API virtual bool GetCastDynamicShadowAsMasked() const override;
 	ENGINE_API virtual bool IsDistorted() const override;
 	ENGINE_API virtual ERefractionCoverageMode GetRefractionCoverageMode() const override;
@@ -3011,6 +3021,9 @@ struct FMaterialShaderParameters
 		uint64 PackedFlags;
 		struct
 		{
+			//[Toon-Pipeline][Add-Begin] 增加描边Pass step15
+			uint64 bOutlined : 1;
+			//[Toon-Pipeline][Add-End]
 			uint64 bIsDefaultMaterial : 1;
 			uint64 bIsSpecialEngineMaterial : 1;
 			uint64 bIsMasked : 1;

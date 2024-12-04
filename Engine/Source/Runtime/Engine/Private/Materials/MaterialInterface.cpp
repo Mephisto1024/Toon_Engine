@@ -6,7 +6,6 @@
 
 #include "Materials/MaterialInterface.h"
 
-#include "AssetTypeCategories.h"
 #include "MeshUVChannelInfo.h"
 #include "RenderingThread.h"
 #include "DataDrivenShaderPlatformInfo.h"
@@ -1166,6 +1165,23 @@ bool UMaterialInterface::GetRefractionSettings(float& OutBiasValue) const
 uint8 UMaterialInterface::GetMaterialStencilValue() const
 {
 	return MaterialStencilValue;
+}
+//[Toon-Pipeline][Add-End]
+
+//[Toon-Pipeline][Add-Begine] 增加描边Pass step2
+bool UMaterialInterface::IsOutLined() const
+{
+	return bOutlined;
+}
+
+float UMaterialInterface::GetOutlineSize() const
+{
+	return OutlineSize;
+}
+
+FLinearColor UMaterialInterface::GetOutlineColor() const
+{
+	return OutlineColor;
 }
 //[Toon-Pipeline][Add-End]
 

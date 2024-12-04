@@ -61,7 +61,10 @@ namespace EMeshPass
 		DitheredLODFadingOutMaskPass, /** A mini depth pass used to mark pixels with dithered LOD fading out. Currently only used by ray tracing shadows. */
 		NaniteMeshPass,
 		MeshDecal,
-
+		//[Toon-Pipeline][Add-Begin] 增加描边Pass step17-1
+		OutlinePass,
+		//[Toon-Pipeline][Add-End]
+		
 #if WITH_EDITOR
 		HitProxy,
 		HitProxyOpaqueOnly,
@@ -110,6 +113,9 @@ inline const TCHAR* GetMeshPassName(EMeshPass::Type MeshPass)
 	case EMeshPass::DitheredLODFadingOutMaskPass: return TEXT("DitheredLODFadingOutMaskPass");
 	case EMeshPass::NaniteMeshPass: return TEXT("NaniteMeshPass");
 	case EMeshPass::MeshDecal: return TEXT("MeshDecal");
+	//[Toon-Pipeline][Add-Begin] 增加描边Pass step17-2
+	case EMeshPass::OutlinePass: return TEXT("OutlinePass");
+	//[Toon-Pipeline][Add-End]
 #if WITH_EDITOR
 	case EMeshPass::HitProxy: return TEXT("HitProxy");
 	case EMeshPass::HitProxyOpaqueOnly: return TEXT("HitProxyOpaqueOnly");
@@ -118,12 +124,19 @@ inline const TCHAR* GetMeshPassName(EMeshPass::Type MeshPass)
 #endif
 	}
 
-#if WITH_EDITOR
+/*#if WITH_EDITOR
 	static_assert(EMeshPass::Num == 30 + 4, "Need to update switch(MeshPass) after changing EMeshPass"); // GUID to prevent incorrect auto-resolves, please change when changing the expression: {A6E82589-44B3-4DAD-AC57-8AF6BD50DF43}
 #else
 	static_assert(EMeshPass::Num == 30, "Need to update switch(MeshPass) after changing EMeshPass"); // GUID to prevent incorrect auto-resolves, please change when changing the expression: {A6E82589-44B3-4DAD-AC57-8AF6BD50DF43}
+#endif*/
+	
+	//[Toon-Pipeline][Add-Begin] 增加描边Pass step17-3
+#if WITH_EDITOR
+	static_assert(EMeshPass::Num == 30 + 4 + 1, "Need to update switch(MeshPass) after changing EMeshPass"); // GUID to prevent incorrect auto-resolves, please change when changing the expression: {A6E82589-44B3-4DAD-AC57-8AF6BD50DF43}
+#else
+	static_assert(EMeshPass::Num == 30 + 1, "Need to update switch(MeshPass) after changing EMeshPass"); // GUID to prevent incorrect auto-resolves, please change when changing the expression: {A6E82589-44B3-4DAD-AC57-8AF6BD50DF43}
 #endif
-
+	//[Toon-Pipeline][Add-End]
 	checkf(0, TEXT("Missing case for EMeshPass %u"), (uint32)MeshPass);
 	return nullptr;
 }

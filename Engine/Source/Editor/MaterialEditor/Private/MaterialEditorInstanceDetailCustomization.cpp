@@ -1227,6 +1227,14 @@ void FMaterialInstanceParameterDetails::CreateBasePropertyOverrideWidgets(IDetai
 	IDetailGroup& BasePropertyOverrideGroup = MaterialPropertyOverrideGroup;
 
 	TAttribute<bool> IsOverrideOpacityClipMaskValueEnabled = TAttribute<bool>::Create(TAttribute<bool>::FGetter::CreateSP(this, &FMaterialInstanceParameterDetails::OverrideOpacityClipMaskValueEnabled));
+	//[Toon-Pipeline][Add-Begine] 逐材质模板 step11-1
+	TAttribute<bool> IsOverrideMaterialStencilValueEnabled = TAttribute<bool>::Create(TAttribute<bool>::FGetter::CreateSP(this, &FMaterialInstanceParameterDetails::OverrideMaterialStencilValueEnabled));
+	//[Toon-Pipeline][Add-End]
+	//[Toon-Pipeline][Add-Begin] 增加描边Pass step12-1
+	TAttribute<bool> IsOverridebOutlinedEnabled = TAttribute<bool>::Create(TAttribute<bool>::FGetter::CreateSP(this, &FMaterialInstanceParameterDetails::OverridebOutlinedEnabled));
+	TAttribute<bool> IsOverrideOutlineSizeEnabled = TAttribute<bool>::Create(TAttribute<bool>::FGetter::CreateSP(this, &FMaterialInstanceParameterDetails::OverrideOutlineSizeEnabled));
+	TAttribute<bool> IsOverrideOutlineColorEnabled = TAttribute<bool>::Create(TAttribute<bool>::FGetter::CreateSP(this, &FMaterialInstanceParameterDetails::OverrideOutlineColorEnabled));
+	//[Toon-Pipeline][Add-End]
 	TAttribute<bool> IsOverrideBlendModeEnabled = TAttribute<bool>::Create(TAttribute<bool>::FGetter::CreateSP(this, &FMaterialInstanceParameterDetails::OverrideBlendModeEnabled));
 	TAttribute<bool> IsOverrideShadingModelEnabled = TAttribute<bool>::Create(TAttribute<bool>::FGetter::CreateSP(this, &FMaterialInstanceParameterDetails::OverrideShadingModelEnabled));
 	TAttribute<bool> IsOverrideTwoSidedEnabled = TAttribute<bool>::Create(TAttribute<bool>::FGetter::CreateSP(this, &FMaterialInstanceParameterDetails::OverrideTwoSidedEnabled));
@@ -1235,14 +1243,16 @@ void FMaterialInstanceParameterDetails::CreateBasePropertyOverrideWidgets(IDetai
 	TAttribute<bool> IsOverrideOutputTranslucentVelocityEnabled = TAttribute<bool>::Create(TAttribute<bool>::FGetter::CreateSP(this, &FMaterialInstanceParameterDetails::OverrideOutputTranslucentVelocityEnabled));
 	TAttribute<bool> IsOverrideDisplacementScalingEnabled = TAttribute<bool>::Create(TAttribute<bool>::FGetter::CreateSP(this, &FMaterialInstanceParameterDetails::OverrideDisplacementScalingEnabled)); 
 	TAttribute<bool> IsOverrideMaxWorldPositionOffsetDisplacementEnabled = TAttribute<bool>::Create(TAttribute<bool>::FGetter::CreateSP(this, &FMaterialInstanceParameterDetails::OverrideMaxWorldPositionOffsetDisplacementEnabled));
-	//[Toon-Pipeline][Add-Begine] 逐材质模板 step11-1
-	TAttribute<bool> IsOverrideMaterialStencilValueEnabled = TAttribute<bool>::Create(TAttribute<bool>::FGetter::CreateSP(this, &FMaterialInstanceParameterDetails::OverrideMaterialStencilValueEnabled));
-	//[Toon-Pipeline][Add-End]
 	
 	TSharedRef<IPropertyHandle> BasePropertyOverridePropery = DetailLayout.GetProperty("BasePropertyOverrides");
 	TSharedPtr<IPropertyHandle> OpacityClipMaskValueProperty = BasePropertyOverridePropery->GetChildHandle("OpacityMaskClipValue");
 	//[Toon-Pipeline][Add-Begine] 逐材质模板 step11-3
 	TSharedPtr<IPropertyHandle> MaterialStencilValueProperty = BasePropertyOverridePropery->GetChildHandle("MaterialStencilValue");
+	//[Toon-Pipeline][Add-End]
+	//[Toon-Pipeline][Add-Begin] 增加描边Pass step12-2
+	TSharedPtr<IPropertyHandle> bOutlinedProperty = BasePropertyOverridePropery->GetChildHandle("bOutlined");
+	TSharedPtr<IPropertyHandle> OutlineSizeProperty = BasePropertyOverridePropery->GetChildHandle("OutlineSize");
+	TSharedPtr<IPropertyHandle> OutlineColorProperty = BasePropertyOverridePropery->GetChildHandle("OutlineColor");
 	//[Toon-Pipeline][Add-End]
 	TSharedPtr<IPropertyHandle> BlendModeProperty = BasePropertyOverridePropery->GetChildHandle("BlendMode");
 	TSharedPtr<IPropertyHandle> ShadingModelProperty = BasePropertyOverridePropery->GetChildHandle("ShadingModel");
@@ -1300,6 +1310,66 @@ void FMaterialInstanceParameterDetails::CreateBasePropertyOverrideWidgets(IDetai
 			.EditCondition(IsOverrideMaterialStencilValueEnabled, FOnBooleanValueChanged::CreateSP(this, &FMaterialInstanceParameterDetails::OnOverrideMaterialStencilValueChanged))
 			.Visibility(TAttribute<EVisibility>::Create(TAttribute<EVisibility>::FGetter::CreateSP(this, &FMaterialInstanceParameterDetails::IsOverriddenAndVisible, IsOverrideMaterialStencilValueEnabled)))
 			.OverrideResetToDefault(ResetMaterialStencilValuePropertyOverride);
+	}
+	//[Toon-Pipeline][Add-End]
+
+	//[Toon-Pipeline][Add-Begin] 增加描边Pass step12-3
+	{
+		FIsResetToDefaultVisible IsbOutlinedPropertyResetVisible = FIsResetToDefaultVisible::CreateLambda([this](TSharedPtr<IPropertyHandle> InHandle) {
+			return MaterialEditorInstance->Parent != nullptr ? MaterialEditorInstance->BasePropertyOverrides.bOutlined != MaterialEditorInstance->Parent->IsOutLined() : false;
+			});
+		FResetToDefaultHandler ResetbOutlinedPropertyHandler = FResetToDefaultHandler::CreateLambda([this](TSharedPtr<IPropertyHandle> InHandle) {
+			if (MaterialEditorInstance->Parent != nullptr)
+			{
+				MaterialEditorInstance->BasePropertyOverrides.bOutlined = MaterialEditorInstance->Parent->IsOutLined();
+			}
+			});
+		FResetToDefaultOverride ResetbOutlinedPropertyOverride = FResetToDefaultOverride::Create(IsbOutlinedPropertyResetVisible, ResetbOutlinedPropertyHandler);
+		IDetailPropertyRow& bOutlinedPropertyRow = BasePropertyOverrideGroup.AddPropertyRow(bOutlinedProperty.ToSharedRef());
+		bOutlinedPropertyRow
+			.DisplayName(bOutlinedProperty->GetPropertyDisplayName())
+			.ToolTip(bStaticParametersOverrideDisabled ? ParameterDisabledToolTipString : bOutlinedProperty->GetToolTipText())
+			.EditCondition(IsOverridebOutlinedEnabled, FOnBooleanValueChanged::CreateSP(this, &FMaterialInstanceParameterDetails::OnOverridebOutlinedChanged))
+			.Visibility(TAttribute<EVisibility>::Create(TAttribute<EVisibility>::FGetter::CreateSP(this, &FMaterialInstanceParameterDetails::IsOverriddenAndVisible, IsOverridebOutlinedEnabled)))
+			.OverrideResetToDefault(ResetbOutlinedPropertyOverride);
+	}
+	{
+		FIsResetToDefaultVisible IsOutlineSizePropertyResetVisible = FIsResetToDefaultVisible::CreateLambda([this](TSharedPtr<IPropertyHandle> InHandle) {
+			return MaterialEditorInstance->Parent != nullptr ? MaterialEditorInstance->BasePropertyOverrides.OutlineSize != MaterialEditorInstance->Parent->GetOutlineSize() : false;
+			});
+		FResetToDefaultHandler ResetOutlineSizePropertyHandler = FResetToDefaultHandler::CreateLambda([this](TSharedPtr<IPropertyHandle> InHandle) {
+			if (MaterialEditorInstance->Parent != nullptr)
+			{
+				MaterialEditorInstance->BasePropertyOverrides.OutlineSize = MaterialEditorInstance->Parent->GetOutlineSize();
+			}
+			});
+		FResetToDefaultOverride ResetOutlineSizePropertyOverride = FResetToDefaultOverride::Create(IsOutlineSizePropertyResetVisible, ResetOutlineSizePropertyHandler);
+		IDetailPropertyRow& OutlineSizePropertyRow = BasePropertyOverrideGroup.AddPropertyRow(OutlineSizeProperty.ToSharedRef());
+		OutlineSizePropertyRow
+			.DisplayName(OutlineSizeProperty->GetPropertyDisplayName())
+			.ToolTip(bStaticParametersOverrideDisabled ? ParameterDisabledToolTipString : OutlineSizeProperty->GetToolTipText())
+			.EditCondition(IsOverrideOutlineSizeEnabled, FOnBooleanValueChanged::CreateSP(this, &FMaterialInstanceParameterDetails::OnOverrideOutlineSizeChanged))
+			.Visibility(TAttribute<EVisibility>::Create(TAttribute<EVisibility>::FGetter::CreateSP(this, &FMaterialInstanceParameterDetails::IsOverriddenAndVisible, IsOverrideOutlineSizeEnabled)))
+			.OverrideResetToDefault(ResetOutlineSizePropertyOverride);
+	}
+	{
+		FIsResetToDefaultVisible IsOutlineColorPropertyResetVisible = FIsResetToDefaultVisible::CreateLambda([this](TSharedPtr<IPropertyHandle> InHandle) {
+			return MaterialEditorInstance->Parent != nullptr ? MaterialEditorInstance->BasePropertyOverrides.OutlineColor != MaterialEditorInstance->Parent->GetOutlineColor() : false;
+			});
+		FResetToDefaultHandler ResetOutlineColorPropertyHandler = FResetToDefaultHandler::CreateLambda([this](TSharedPtr<IPropertyHandle> InHandle) {
+			if (MaterialEditorInstance->Parent != nullptr)
+			{
+				MaterialEditorInstance->BasePropertyOverrides.OutlineColor = MaterialEditorInstance->Parent->GetOutlineColor();
+			}
+			});
+		FResetToDefaultOverride ResetOutlineColorPropertyOverride = FResetToDefaultOverride::Create(IsOutlineColorPropertyResetVisible, ResetOutlineColorPropertyHandler);
+		IDetailPropertyRow& OutlineColorPropertyRow = BasePropertyOverrideGroup.AddPropertyRow(OutlineColorProperty.ToSharedRef());
+		OutlineColorPropertyRow
+			.DisplayName(OutlineColorProperty->GetPropertyDisplayName())
+			.ToolTip(bStaticParametersOverrideDisabled ? ParameterDisabledToolTipString : OutlineColorProperty->GetToolTipText())
+			.EditCondition(IsOverrideOutlineColorEnabled, FOnBooleanValueChanged::CreateSP(this, &FMaterialInstanceParameterDetails::OnOverrideOutlineColorChanged))
+			.Visibility(TAttribute<EVisibility>::Create(TAttribute<EVisibility>::FGetter::CreateSP(this, &FMaterialInstanceParameterDetails::IsOverriddenAndVisible, IsOverrideOutlineColorEnabled)))
+			.OverrideResetToDefault(ResetOutlineColorPropertyOverride);
 	}
 	//[Toon-Pipeline][Add-End]
 	{
@@ -1503,6 +1573,20 @@ bool FMaterialInstanceParameterDetails::OverrideMaterialStencilValueEnabled() co
 }
 //[Toon-Pipeline][Add-End]
 
+//[Toon-Pipeline][Add-Begin] 增加描边Pass step12-4
+bool FMaterialInstanceParameterDetails::OverridebOutlinedEnabled() const
+{
+	return MaterialEditorInstance->BasePropertyOverrides.bOverride_Outlined;
+}
+bool FMaterialInstanceParameterDetails::OverrideOutlineSizeEnabled() const
+{
+	return MaterialEditorInstance->BasePropertyOverrides.bOverride_OutlineSize;
+}
+bool FMaterialInstanceParameterDetails::OverrideOutlineColorEnabled() const
+{
+	return MaterialEditorInstance->BasePropertyOverrides.bOverride_OutlineColor;
+}
+//[Toon-Pipeline][Add-End]
 bool FMaterialInstanceParameterDetails::OverrideBlendModeEnabled() const
 {
 	return MaterialEditorInstance->BasePropertyOverrides.bOverride_BlendMode;
@@ -1574,6 +1658,39 @@ void FMaterialInstanceParameterDetails::OnOverrideMaterialStencilValueChanged(bo
 		return;
 	}
 	MaterialEditorInstance->BasePropertyOverrides.bOverride_MaterialStencilValue = NewValue;
+	MaterialEditorInstance->PostEditChange();
+	FEditorSupportDelegates::RedrawAllViewports.Broadcast();
+}
+//[Toon-Pipeline][Add-End]
+
+//[Toon-Pipeline][Add-Begin] 增加描边Pass step12-5
+void FMaterialInstanceParameterDetails::OnOverridebOutlinedChanged(bool NewValue)
+{
+	if (DoesSourceMaterialInstanceDisallowStaticParameterPermutation(MaterialEditorInstance, NewValue))
+	{
+		return;
+	}
+	MaterialEditorInstance->BasePropertyOverrides.bOverride_Outlined = NewValue;
+	MaterialEditorInstance->PostEditChange();
+	FEditorSupportDelegates::RedrawAllViewports.Broadcast();
+}
+void FMaterialInstanceParameterDetails::OnOverrideOutlineSizeChanged(bool NewValue)
+{
+	if (DoesSourceMaterialInstanceDisallowStaticParameterPermutation(MaterialEditorInstance, NewValue))
+	{
+		return;
+	}
+	MaterialEditorInstance->BasePropertyOverrides.bOverride_OutlineSize = NewValue;
+	MaterialEditorInstance->PostEditChange();
+	FEditorSupportDelegates::RedrawAllViewports.Broadcast();
+}
+void FMaterialInstanceParameterDetails::OnOverrideOutlineColorChanged(bool NewValue)
+{
+	if (DoesSourceMaterialInstanceDisallowStaticParameterPermutation(MaterialEditorInstance, NewValue))
+	{
+		return;
+	}
+	MaterialEditorInstance->BasePropertyOverrides.bOverride_OutlineColor = NewValue;
 	MaterialEditorInstance->PostEditChange();
 	FEditorSupportDelegates::RedrawAllViewports.Broadcast();
 }

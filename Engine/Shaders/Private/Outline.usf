@@ -1,0 +1,32 @@
+#include "Common.ush"
+#include "/Engine/Generated/Material.ush"
+#include "/Engine/Generated/VertexFactory.ush"
+
+float OutlineSize;
+float3 OutlineColor;
+
+void MainVS(
+	FVertexFactoryInput Input,
+	out float4 OutPos : SV_POSITION
+)
+{
+	ResolvedView = ResolveView();
+	FVertexFactoryIntermediates VFIntermediates = GetVertexFactoryIntermediates(Input);
+	float4 WorldPosition = VertexFactoryGetWorldPosition(Input, VFIntermediates);
+	float3 WorldNormal = VertexFactoryGetWorldNormal(Input, VFIntermediates);
+	float3x3 TangentToLocal = VertexFactoryGetTangentToLocal(Input, VFIntermediates);
+	FMaterialVertexParameters VertexParameters = GetMaterialVertexParameters(Input, VFIntermediates, WorldPosition.xyz, TangentToLocal);
+	WorldPosition.xyz += GetMaterialWorldPositionOffset(VertexParameters);
+
+	OutPos = mul(WorldPosition, ResolvedView.TranslatedWorldToClip);
+	float2 OffsetDir = normalize(mul(float4(WorldNormal, 1.0f), ResolvedView.TranslatedWorldToClip).xy);
+	float Length = clamp(0.0f, OutlineSize*4.0f, OutPos.w * OutlineSize*0.01 );
+	OutPos.xy += OffsetDir * Length;
+}
+
+void MainPS(
+	out float4 OutColor : SV_Target0
+)
+{
+	OutColor = float4(OutlineColor, 1.0);
+}

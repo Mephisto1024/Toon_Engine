@@ -3928,6 +3928,10 @@ void FDeferredShadingSceneRenderer::Render(FRDGBuilder& GraphBuilder)
 			RenderGlobalIlluminationPluginVisualizations(GraphBuilder, LightingChannelsTexture);
 #endif
 
+			//[Toon-Pipeline][Add-Begin] 增加描边Pass step21
+			//RenderOutlinePass(GraphBuilder,SceneTextures);
+			//[Toon-Pipeline][Add-End]
+			
 			AddSubsurfacePass(GraphBuilder, SceneTextures, Views);
 
 			Strata::AddStrataOpaqueRoughRefractionPasses(GraphBuilder, SceneTextures, Views);

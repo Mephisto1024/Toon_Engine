@@ -1461,6 +1461,9 @@ void FRelevancePacket::ComputeRelevance(FDynamicPrimitiveIndexList& DynamicPrimi
 								else // Regular shading path
 								{
 									DrawCommandPacket.AddCommandsForMesh(PrimitiveIndex, PrimitiveSceneInfo, StaticMeshRelevance, StaticMesh, Scene, bCanCache, EMeshPass::BasePass);
+									//[Toon-Pipeline][Add-Begin] 增加描边Pass step19-1
+									DrawCommandPacket.AddCommandsForMesh(PrimitiveIndex, PrimitiveSceneInfo, StaticMeshRelevance, StaticMesh, Scene, bCanCache, EMeshPass::OutlinePass);
+									//[Toon-Pipeline][Add-End]
 									MarkMask |= EMarkMaskBits::StaticMeshVisibilityMapMask;
 
 									if (StaticMeshRelevance.bUseSkyMaterial)
@@ -2056,6 +2059,11 @@ static void ComputeDynamicMeshRelevance(
 			PassMask.Set(EMeshPass::BasePass);
 			View.NumVisibleDynamicMeshElements[EMeshPass::BasePass] += NumElements;
 
+			//[Toon-Pipeline][Add-Begin] 增加描边Pass step19-2
+			PassMask.Set(EMeshPass::OutlinePass);
+			View.NumVisibleDynamicMeshElements[EMeshPass::OutlinePass] += NumElements;
+			//[Toon-Pipeline][Add-End]
+			
 			if (ViewRelevance.bUsesSkyMaterial)
 			{
 				PassMask.Set(EMeshPass::SkyPass);

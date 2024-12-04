@@ -111,6 +111,11 @@ private:
 	//[Toon-Pipeline][Add-Begine] 逐材质模板 step10-1
 	bool OverrideMaterialStencilValueEnabled() const;
 	//[Toon-Pipeline][Add-End]
+	//[Toon-Pipeline][Add-Begin] 增加描边Pass step11-1
+	bool OverridebOutlinedEnabled() const;
+	bool OverrideOutlineSizeEnabled() const;
+	bool OverrideOutlineColorEnabled() const;
+	//[Toon-Pipeline][Add-End]
 	bool OverrideBlendModeEnabled() const;
 	bool OverrideShadingModelEnabled() const;
 	bool OverrideTwoSidedEnabled() const;
@@ -122,6 +127,11 @@ private:
 	void OnOverrideOpacityClipMaskValueChanged(bool NewValue);
 	//[Toon-Pipeline][Add-Begine] 逐材质模板 step10-2
 	void OnOverrideMaterialStencilValueChanged(bool NewValue);
+	//[Toon-Pipeline][Add-End]
+	//[Toon-Pipeline][Add-Begin] 增加描边Pass step11-2
+	void OnOverridebOutlinedChanged(bool NewValue);
+	void OnOverrideOutlineSizeChanged(bool NewValue);
+	void OnOverrideOutlineColorChanged(bool NewValue);
 	//[Toon-Pipeline][Add-End]
 	void OnOverrideBlendModeChanged(bool NewValue);
 	void OnOverrideShadingModelChanged(bool NewValue);

@@ -2075,6 +2075,23 @@ uint8 UMaterialInstance::GetMaterialStencilValue() const
 }
 //[Toon-Pipeline][Add-End]
 
+//[Toon-Pipeline][Add-Begine] 增加描边Pass step6
+bool UMaterialInstance::IsOutLined() const
+{
+	return Super::IsOutLined();
+}
+
+float UMaterialInstance::GetOutlineSize() const
+{
+	return Super::GetOutlineSize();
+}
+
+FLinearColor UMaterialInstance::GetOutlineColor() const
+{
+	return Super::GetOutlineColor();
+}
+//[Toon-Pipeline][Add-End]
+
 void UMaterialInstance::InitStaticPermutation(EMaterialShaderPrecompileMode PrecompileMode)
 {
 	UpdateOverridableBaseProperties();
@@ -2129,6 +2146,11 @@ void UMaterialInstance::UpdateOverridableBaseProperties()
 		//[Toon-Pipeline][Add-Begine] 逐材质模板 step6-3
 		MaterialStencilValue = 0;
 		//[Toon-Pipeline][Add-End]
+		//[Toon-Pipeline][Add-Begine] 增加描边Pass step8-2
+		bOutlined = false;
+		OutlineSize = 0.0f;
+		OutlineColor = FLinearColor::Black;
+		//[Toon-Pipeline][Add-End]
 		return;
 	}
 
@@ -2151,6 +2173,38 @@ void UMaterialInstance::UpdateOverridableBaseProperties()
 	{
 		MaterialStencilValue = Parent->GetMaterialStencilValue();
 		BasePropertyOverrides.MaterialStencilValue = MaterialStencilValue;
+	}
+	//[Toon-Pipeline][Add-End]
+
+	//[Toon-Pipeline][Add-Begin] 增加描边Pass step8-3
+	if(BasePropertyOverrides.bOverride_Outlined)
+	{
+		bOutlined = BasePropertyOverrides.bOutlined;
+	}
+	else
+	{
+		bOutlined = Parent->IsOutLined();
+		BasePropertyOverrides.bOutlined = bOutlined;
+	}
+
+	if(BasePropertyOverrides.bOverride_OutlineSize)
+	{
+		OutlineSize = BasePropertyOverrides.OutlineSize;
+	}
+	else
+	{
+		OutlineSize = Parent->GetOutlineSize();
+		BasePropertyOverrides.OutlineSize = OutlineSize;
+	}
+	
+	if(BasePropertyOverrides.bOverride_OutlineColor)
+	{
+		OutlineColor = BasePropertyOverrides.OutlineColor;
+	}
+	else
+	{
+		OutlineColor = Parent->GetOutlineColor();
+		BasePropertyOverrides.OutlineColor = OutlineColor;
 	}
 	//[Toon-Pipeline][Add-End]
 	
@@ -4502,6 +4556,11 @@ bool UMaterialInstance::HasOverridenBaseProperties()const
 		((FMath::Abs(GetOpacityMaskClipValue() - Parent->GetOpacityMaskClipValue()) > UE_SMALL_NUMBER) ||
 		//[Toon-Pipeline][Add-Begine] 逐材质模板 step6-2
 		(GetMaterialStencilValue() != Parent->GetMaterialStencilValue()) ||
+		//[Toon-Pipeline][Add-End]
+		//[Toon-Pipeline][Add-Begine] 增加描边Pass step8-1
+		(IsOutLined() != Parent->IsOutLined()) ||
+		(GetOutlineSize() != Parent->GetOutlineSize()) ||
+		(GetOutlineColor() != Parent->GetOutlineColor()) ||
 		//[Toon-Pipeline][Add-End]
 		(GetBlendMode() != Parent->GetBlendMode()) ||
 		(GetShadingModels() != Parent->GetShadingModels()) ||

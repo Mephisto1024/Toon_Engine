@@ -1371,6 +1371,23 @@ uint8 UMaterial::GetMaterialStencilValue() const
 }
 //[Toon-Pipeline][Add-End]
 
+//[Toon-Pipeline][Add-Begine] 增加描边Pass step4
+bool UMaterial::IsOutLined() const
+{
+	return Super::IsOutLined();
+}
+
+float UMaterial::GetOutlineSize() const
+{
+	return Super::GetOutlineSize();
+}
+
+FLinearColor UMaterial::GetOutlineColor() const
+{
+	return Super::GetOutlineColor();
+}
+//[Toon-Pipeline][Add-End]
+
 bool UMaterial::GetUsageByFlag(EMaterialUsage Usage) const
 {
 	bool UsageValue = false;

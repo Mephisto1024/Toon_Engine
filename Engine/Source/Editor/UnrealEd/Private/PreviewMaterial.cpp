@@ -920,6 +920,20 @@ void UMaterialEditorInstanceConstant::CopyBasePropertiesFromParent()
 		BasePropertyOverrides.MaterialStencilValue = SourceInstance->GetMaterialStencilValue();
 	}
 	//[Toon-Pipeline][Add-End]
+	//[Toon-Pipeline][Add-Begin] 增加描边Pass step10
+	if(!BasePropertyOverrides.bOverride_Outlined)
+	{
+		BasePropertyOverrides.bOutlined = SourceInstance->IsOutLined();
+	}
+	if(!BasePropertyOverrides.bOverride_OutlineSize)
+	{
+		BasePropertyOverrides.OutlineSize = SourceInstance->GetOutlineSize();
+	}
+	if(!BasePropertyOverrides.bOverride_OutlineColor)
+	{
+		BasePropertyOverrides.OutlineColor = SourceInstance->GetOutlineColor();
+	}
+	//[Toon-Pipeline][Add-End]
 	if (!BasePropertyOverrides.bOverride_BlendMode)
 	{
 		BasePropertyOverrides.BlendMode = SourceInstance->GetBlendMode();

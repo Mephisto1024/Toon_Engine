@@ -796,6 +796,11 @@ public:
 	//[Toon-Pipeline][Add-Begine] 逐材质模板 step5
 	ENGINE_API virtual uint8 GetMaterialStencilValue() const override;
 	//[Toon-Pipeline][Add-End]
+	//[Toon-Pipeline][Add-Begine] 增加描边Pass step5
+	ENGINE_API virtual bool IsOutLined() const override;
+	ENGINE_API virtual float  GetOutlineSize() const override;
+	ENGINE_API virtual FLinearColor GetOutlineColor() const override;
+	//[Toon-Pipeline][Add-End]
 	ENGINE_API virtual float GetOpacityMaskClipValue() const override;
 	ENGINE_API virtual bool GetCastDynamicShadowAsMasked() const override;
 	ENGINE_API virtual EBlendMode GetBlendMode() const override;

@@ -21,6 +21,15 @@ struct FMaterialInstanceBasePropertyOverrides
 	UPROPERTY(EditAnywhere, Category = Material)
 	uint8 bOverride_MaterialStencilValue : 1;
 	//[Toon-Pipeline][Add-End]
+
+	//[Toon-Pipeline][Add-Begine] 增加描边Pass step7-1
+	UPROPERTY(EditAnywhere, Category = Material)
+	uint8 bOverride_Outlined : 1;
+	UPROPERTY(EditAnywhere, Category = Material)
+	uint8 bOverride_OutlineSize : 1;
+	UPROPERTY(EditAnywhere, Category = Material)
+	uint8 bOverride_OutlineColor : 1;
+	//[Toon-Pipeline][Add-End]
 	
 	/** Enables override of the blend mode. */
 	UPROPERTY(EditAnywhere, Category = Material)
@@ -94,7 +103,15 @@ struct FMaterialInstanceBasePropertyOverrides
 	UPROPERTY(EditAnywhere, Category = Material, meta = (editcondition = "bOverride_MaterialStencilValue"))
 	uint8 MaterialStencilValue;
 	//[Toon-Pipeline][Add-End]
-	
+
+	//[Toon-Pipeline][Add-Begine] 增加描边Pass step7-2
+	UPROPERTY(EditAnywhere, Category = Material, meta = (editcondition = "bOverride_Outlined"))
+	bool bOutlined;
+	UPROPERTY(EditAnywhere, Category = Material, meta = (editcondition = "bOverride_OutlineSize"))
+	float OutlineSize;
+	UPROPERTY(EditAnywhere, Category = Material, meta = (editcondition = "bOverride_OutlineColor"))
+	FLinearColor OutlineColor;
+	//[Toon-Pipeline][Add-End]
 	UPROPERTY(EditAnywhere, Category = Material, meta = (editcondition = "bOverride_DisplacementScaling"))
 	FDisplacementScaling DisplacementScaling;
 
