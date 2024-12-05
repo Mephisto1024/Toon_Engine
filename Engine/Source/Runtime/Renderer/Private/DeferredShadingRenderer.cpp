@@ -3929,7 +3929,7 @@ void FDeferredShadingSceneRenderer::Render(FRDGBuilder& GraphBuilder)
 #endif
 
 			//[Toon-Pipeline][Add-Begin] 增加描边Pass step21
-			//RenderOutlinePass(GraphBuilder,SceneTextures);
+			RenderOutlinePass(GraphBuilder,SceneTextures);
 			//[Toon-Pipeline][Add-End]
 			
 			AddSubsurfacePass(GraphBuilder, SceneTextures, Views);
