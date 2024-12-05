@@ -22,6 +22,15 @@
 
 struct FPostProcessSettings;
 
+//[Toon-Pipeline][Add-Begin] GT色调映射 step1
+UENUM()
+enum EToneMapper : int
+{
+	TM_Film UMETA(DisplayName="Film"),
+	TM_GT UMETA(DisplayName="GT"),
+	TM_MAX,
+};
+//[Toon-Pipeline][Add-End]
 
 /** Used by FPostProcessSettings Depth of Fields */
 UENUM()
@@ -741,6 +750,11 @@ struct FPostProcessSettings
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Overrides, meta = (PinHiddenByDefault, InlineEditConditionToggle))
 	uint8 bOverride_ToneCurveAmount : 1;
 
+	//[Toon-Pipeline][Add-Begin] GT色调映射 step2
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Overrides, meta = (PinHiddenByDefault, InlineEditConditionToggle))
+	uint8 bOverride_ToneMapper : 1;
+	//[Toon-Pipeline][Add-End]
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Overrides, meta=(PinHiddenByDefault, InlineEditConditionToggle))
 	uint8 bOverride_FilmSlope:1;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Overrides, meta=(PinHiddenByDefault, InlineEditConditionToggle))
@@ -1404,6 +1418,11 @@ struct FPostProcessSettings
 	UPROPERTY(interp, BlueprintReadWrite, Category = "Color Grading|Misc", meta = (ClampMin = "0.0", UIMax = "1.0", editcondition = "bOverride_ToneCurveAmount"))
 	float ToneCurveAmount;
 
+	//[Toon-Pipeline][Add-Begin] GT色调映射 step3
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ToneMap",meta = (DisplayName = "ToneMapper", editcondition = "bOverride_ToneMapper" ))
+	TEnumAsByte<enum EToneMapper> ToneMapper;
+	//[Toon-Pipeline][Add-End]
+	
 	UPROPERTY(interp, BlueprintReadWrite, Category="Film", meta=(UIMin = "0.0", UIMax = "1.0", editcondition = "bOverride_FilmSlope", DisplayName = "Slope"))
 	float FilmSlope;
 	UPROPERTY(interp, BlueprintReadWrite, Category="Film", meta=(UIMin = "0.0", UIMax = "1.0", editcondition = "bOverride_FilmToe", DisplayName = "Toe"))

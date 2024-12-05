@@ -33,6 +33,9 @@ half4 OverlayColor;
 
 uint bUseMobileTonemapper;
 uint bIsTemperatureWhiteBalance;
+//[Toon-Pipeline][Add-Begin] GT色调映射 step8
+uint ToneMapperType;
+//[Toon-Pipeline][Add-End]
 
 float LUTSize;
 
@@ -259,7 +262,31 @@ float4 CombineLUTsCommon(float2 InUV, uint InLayerIndex)
 	ColorAP1 = lerp( ColorAP1, mul( BlueCorrectAP1, ColorAP1 ), BlueCorrection );
 
 	// Tonemapped color in the AP1 gamut
-	float3 ToneMappedColorAP1 = FilmToneMap( ColorAP1 );
+	//float3 ToneMappedColorAP1 = FilmToneMap( ColorAP1 );
+	//[Toon-Pipeline][Add-Begin] GT色调映射 step
+	float3 ToneMappedColorAP1;
+	/*switch (ToneMapperType)
+	{
+	case 0:
+		ToneMappedColorAP1 = FilmToneMap( ColorAP1 );
+		break;
+	case 1:
+		ToneMappedColorAP1 = GranTurismoToneMap( ColorAP1 );
+		break;
+	default:
+		ToneMappedColorAP1 = FilmToneMap( ColorAP1 );
+		break;
+	}*/
+	if(ToneMapperType ==0)
+	{
+		ToneMappedColorAP1 = FilmToneMap( ColorAP1 );
+	}
+	else
+	{
+		ToneMappedColorAP1 = GranTurismoToneMap( ColorAP1 );
+	}
+	//[Toon-Pipeline][Add-End]
+	
 	ColorAP1 = lerp(ColorAP1, ToneMappedColorAP1, ToneCurveAmount);
 
 	// Uncorrect blue to maintain white point

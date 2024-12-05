@@ -160,6 +160,9 @@ BEGIN_SHADER_PARAMETER_STRUCT(FCombineLUTParameters, )
 	SHADER_PARAMETER(float, FilmWhiteClip)
 	SHADER_PARAMETER(uint32, bUseMobileTonemapper)
 	SHADER_PARAMETER(uint32, bIsTemperatureWhiteBalance)
+	//[Toon-Pipeline][Add-Begin] GT色调映射 step6
+	SHADER_PARAMETER(uint32, ToneMapperType)
+	//[Toon-Pipeline][Add-End]
 	SHADER_PARAMETER_STRUCT_INCLUDE(FColorRemapParameters, ColorRemap)
 	SHADER_PARAMETER_STRUCT_INCLUDE(FTonemapperOutputDeviceParameters, OutputDevice)
 END_SHADER_PARAMETER_STRUCT()
@@ -252,6 +255,9 @@ struct FCachedLUTSettings
 
 		// White balance
 		UPDATE_CACHE_SETTINGS(Parameters.bIsTemperatureWhiteBalance, uint32(Settings.TemperatureType == ETemperatureMethod::TEMP_WhiteBalance), bHasChanged);
+		//[Toon-Pipeline][Add-Begin] GT色调映射 step7
+		UPDATE_CACHE_SETTINGS(Parameters.ToneMapperType, uint32(Settings.ToneMapper), bHasChanged);
+		//[Toon-Pipeline][Add-End]
 		UPDATE_CACHE_SETTINGS(Parameters.LUTSize, (float)CVarLUTSize->GetInt(), bHasChanged);
 		UPDATE_CACHE_SETTINGS(Parameters.WhiteTemp, Settings.WhiteTemp, bHasChanged);
 		UPDATE_CACHE_SETTINGS(Parameters.WhiteTint, Settings.WhiteTint, bHasChanged);

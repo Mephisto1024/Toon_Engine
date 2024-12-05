@@ -1462,6 +1462,9 @@ void FSceneView::OverridePostProcessSettings(const FPostProcessSettings& Src, fl
 
 		// The following code needs to be adjusted when settings in FPostProcessSettings change.
 		SET_PP(TemperatureType);
+		//[Toon-Pipeline][Add-Begin] GT色调映射 step5
+		SET_PP(ToneMapper);
+		//[Toon-Pipeline][Add-End]
 		LERP_PP(WhiteTemp);
 		LERP_PP(WhiteTint);
 

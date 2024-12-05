@@ -431,6 +431,10 @@ FPostProcessSettings::FPostProcessSettings()
 
 	// default values:
 
+	//[Toon-Pipeline][Add-Begin] GT色调映射 step4
+	ToneMapper = TM_Film;
+	//[Toon-Pipeline][Add-End]
+	
 	// ACES settings
 	FilmSlope = 0.88f;
 	FilmToe = 0.55f;
