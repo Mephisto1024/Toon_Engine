@@ -58,6 +58,9 @@ enum EGBufferCompression
 	GBC_Raw_Unorm_2, // a float value normalized to use 2 bits
 	GBC_Raw_Float_16_16,
 	GBC_Raw_Float_16,
+	//[Toon-Pipeline][Add-Begin] 扩展ShadingModel上限 step2
+	GBC_Bits_8,
+	//[Toon-Pipeline][Add-End]
 	GBC_Bits_4, // an int value, that is fundamentally 4 bits
 	GBC_Bits_2, // an int value, that is fundamentally 2 bits
 

@@ -648,7 +648,9 @@ enum EMaterialShadingModel : int
 	MSM_MAX
 };
 
-static_assert(MSM_NUM <= 16, "Do not exceed 16 shading models without expanding FMaterialShadingModelField to support uint32 instead of uint16!");
+//[Toon-Pipeline][Modify-Begin] 扩展ShadingModel上限 step5
+static_assert(MSM_NUM <= 256, "Do not exceed 16 shading models without expanding FMaterialShadingModelField to support uint32 instead of uint16!");
+//[Toon-Pipeline][Modify-End]
 
 /** Wrapper for a bitfield of shading models. A material contains one of these to describe what possible shading models can be used by that material. */
 USTRUCT()
@@ -717,7 +719,9 @@ enum EStrataShadingModel : int
 	/** Number of unique shading models. */
 	SSM_NUM						UMETA(Hidden),
 };
-static_assert(SSM_NUM <= 16, "Do not exceed 16 shading models without expanding FStrataMaterialShadingModelField to support uint32 instead of uint16!");
+//[Toon-Pipeline][Modify-Begin] 扩展ShadingModel上限 step6
+static_assert(SSM_NUM <= 256, "Do not exceed 16 shading models without expanding FStrataMaterialShadingModelField to support uint32 instead of uint16!");
+//[Toon-Pipeline][Modify-End]
 
 // This used to track cyclic graph which we do not support. We only support acyclic graph and a depth of 128 is already too high for a realistic use case.
 #define STRATA_TREE_MAX_DEPTH 48

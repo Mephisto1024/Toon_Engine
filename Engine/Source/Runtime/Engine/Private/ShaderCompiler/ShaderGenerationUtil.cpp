@@ -527,6 +527,9 @@ static const FGBufferCompressionInfo GBufferCompressionInfo[] =
 	{ GBC_Raw_Unorm_2, 				  	1, 1, {  2,  0,  0,  0 }, false, false, TEXT("Invalid")                , TEXT("Invalid")                },
 	{ GBC_Raw_Float_16_16,			  	2, 2, { 16, 16,  0,  0 }, false, false, TEXT("Invalid")                , TEXT("Invalid")                },
 	{ GBC_Raw_Float_16,				  	1, 1, { 16,  0,  0,  0 }, false, false, TEXT("Invalid")                , TEXT("Invalid")                },
+	//[Toon-Pipeline][Add-Begin] 扩展ShadingModel上限 step3
+	{ GBC_Bits_8, 					  	1, 1, {  8,  0,  0,  0 },  true, false, TEXT("Invalid")                , TEXT("Invalid")                },
+	//[Toon-Pipeline][Add-End]
 	{ GBC_Bits_4, 					  	1, 1, {  4,  0,  0,  0 },  true, false, TEXT("Invalid")                , TEXT("Invalid")                },
 	{ GBC_Bits_2, 					  	1, 1, {  2,  0,  0,  0 },  true, false, TEXT("Invalid")                , TEXT("Invalid")                },
 	{ GBC_Packed_Normal_Octahedral_8_8, 3, 2, {  8,  8,  0,  0 }, false,  true, TEXT("CompressOctahedral")     , TEXT("DecompressOctahedral")   },

@@ -33,11 +33,11 @@
 //#define SHADINGMODELID_NUM					13
 //#define SHADINGMODELID_MASK					0xF		// 4 bits reserved for ShadingModelID			
 
-//[Sketch-Pipeline][Modify-Begin]添加光照模型
+//[Sketch-Pipeline][Modify-Begin]添加光照模型,扩展ShadingModel上限-8
 #define SHADINGMODELID_SKETCH				13
 #define SHADINGMODELID_TOON				14
 #define SHADINGMODELID_NUM					15
-#define SHADINGMODELID_MASK					0xF		// 4 bits reserved for ShadingModelID	
+#define SHADINGMODELID_MASK					0xFF		// 4 bits reserved for ShadingModelID	
 //[Sketch-Pipeline][Modify-End]		
 
 // The flags are defined so that 0 value has no effect!

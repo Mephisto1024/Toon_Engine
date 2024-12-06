@@ -352,7 +352,10 @@ FGBufferInfo RENDERCORE_API FetchLegacyGBufferInfo(const FGBufferParams& Params)
 
 	Info.Targets[0].Init(GBT_Unorm_11_11_10,  TEXT("Lighting"), false,  true,  true,  true);
 	Info.Targets[1].Init(NormalGBufferFormatTarget,TEXT("GBufferA"), false,  true,  true,  true);
-	Info.Targets[2].Init(DiffuseAndSpecularGBufferFormat,   TEXT("GBufferB"), false,  true,  true,  true);
+	//Info.Targets[2].Init(DiffuseAndSpecularGBufferFormat,   TEXT("GBufferB"), false,  true,  true,  true);
+	//[Toon-Pipeline][Add-Begin] 扩展 ShadingModel上限 step1
+	Info.Targets[2].Init(GBT_Float_16_16_16_16,   TEXT("GBufferB"), false,  true,  true,  true);
+	//[Toon-Pipeline][Add-End]
 	
 	const bool bLegacyAlbedoSrgb = true;
 	Info.Targets[3].Init(DiffuseAndSpecularGBufferFormat,  TEXT("GBufferC"), bLegacyAlbedoSrgb && !bHighPrecisionGBuffers,  true,  true,  true);
@@ -442,15 +445,17 @@ FGBufferInfo RENDERCORE_API FetchLegacyGBufferInfo(const FGBufferParams& Params)
 	Info.Slots[GBS_Roughness] = FGBufferItem(GBS_Roughness, GBC_Packed_Quantized_4, GBCH_Both);
 	Info.Slots[GBS_Roughness].Packing[0] = FGBufferPacking(TargetGBufferB, 0, 1, 0, 0, 4);
 #endif
+	
+	//[Toon-Pipeline][Modify-Begin] 扩展ShadingModel上限 step4
+	// pack it into bits [0:7] of alpha
+	Info.Slots[GBS_ShadingModelId] = FGBufferItem(GBS_ShadingModelId, GBC_Bits_8, GBCH_Both);
+	Info.Slots[GBS_ShadingModelId].Packing[0] = FGBufferPacking(TargetGBufferB, 0, 3, 0, 0, 8);
 
-	// pack it into bits [0:3] of alpha
-	Info.Slots[GBS_ShadingModelId] = FGBufferItem(GBS_ShadingModelId, GBC_Bits_4, GBCH_Both);
-	Info.Slots[GBS_ShadingModelId].Packing[0] = FGBufferPacking(TargetGBufferB, 0, 3, 0, 0, 4);
-
-	// pack it into bits [4:7] of alpha
+	// pack it into bits [8:11] of alpha
 	Info.Slots[GBS_SelectiveOutputMask] = FGBufferItem(GBS_SelectiveOutputMask, GBC_Bits_4, GBCH_Both);
-	Info.Slots[GBS_SelectiveOutputMask].Packing[0] = FGBufferPacking(TargetGBufferB, 0, 3, 0, 4, 4);
-
+	Info.Slots[GBS_SelectiveOutputMask].Packing[0] = FGBufferPacking(TargetGBufferB, 0, 3, 0, 8, 4);
+	//[Toon-Pipeline][Modify-End]
+	
 	{
 #if 1
 		EGBufferCompression BaseColorCompression = GBC_Invalid;
