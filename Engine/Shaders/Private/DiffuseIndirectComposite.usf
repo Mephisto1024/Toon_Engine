@@ -572,6 +572,13 @@ void MainPS(
 			1.0f,
 			Material.bNeedsSeparateLightAccumulation);
 		OutAddColor = LightAccumulator_GetResult(LightAccumulator);
+		//[Toon-Pipeline][Add-Begin] 消除环境光影响 step2
+		//Lumen和SSAO
+		if (Material.GBufferData.ShadingModelID == SHADINGMODELID_TOON)
+		{
+			OutAddColor = float4(0.0f, 0.0f, 0.0f, 1.0f);
+		}
+		//[Toon-Pipeline][Add-End]
 	#endif // !STRATA_ENABLED
 
 	}

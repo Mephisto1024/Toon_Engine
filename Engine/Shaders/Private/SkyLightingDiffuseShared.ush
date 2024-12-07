@@ -135,7 +135,8 @@ float3 SkyLightDiffuse(FGBufferData GBuffer, float AmbientOcclusion, float2 Buff
 
 	//Lighting = (Texture2DSampleLevel(BentNormalAOTexture, BentNormalAOSampler, UV, 0).xyz);
 
-	//[Toon-Pipeline][Add-Begine] 逐材质模板 step
+	//[Toon-Pipeline][Add-Begine] 消除环境光影响 step3
+	//SkyLight天光
 	Lighting = 0;
 	//[Toon-Pipeline][Add-End]
 	
