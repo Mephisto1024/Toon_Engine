@@ -2768,6 +2768,9 @@ struct FFastVramConfig
 	ETextureCreateFlags VolumetricFog;
 	ETextureCreateFlags SeparateTranslucency;
 	ETextureCreateFlags SeparateTranslucencyModulate;
+	//[Toon-Pipeline][Add-Begin] 增加ToonOutlineBuffer step7
+	ETextureCreateFlags ToonOutline;
+	//[Toon-Pipeline][Add-End]
 	ETextureCreateFlags ScreenSpaceAO;
 	ETextureCreateFlags SSR;
 	ETextureCreateFlags DBufferA;

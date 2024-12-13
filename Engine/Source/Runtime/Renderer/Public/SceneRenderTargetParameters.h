@@ -43,8 +43,11 @@ enum class ESceneTextureSetupMode : uint32
 	GBufferF		= 1 << 8,
 	SSAO			= 1 << 9,
 	CustomDepth		= 1 << 10,
+	//[Toon-Pipeline][Add-Begin] 增加ToonOutlineBuffer step8
+	ToonOutline		= 1 << 11,
+	//[Toon-Pipeline][Add-End]
 	GBuffers		= GBufferA | GBufferB | GBufferC | GBufferD | GBufferE | GBufferF,
-	All				= SceneColor | SceneDepth | SceneVelocity | GBuffers | SSAO | CustomDepth
+	All				= SceneColor | SceneDepth | SceneVelocity | GBuffers | SSAO | CustomDepth | ToonOutline
 };
 ENUM_CLASS_FLAGS(ESceneTextureSetupMode);
 

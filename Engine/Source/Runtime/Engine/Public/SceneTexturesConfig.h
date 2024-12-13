@@ -26,6 +26,10 @@ BEGIN_GLOBAL_SHADER_PARAMETER_STRUCT(FSceneTextureUniformParameters, ENGINE_API)
 	SHADER_PARAMETER_RDG_TEXTURE(Texture2D, GBufferFTexture)
 	SHADER_PARAMETER_RDG_TEXTURE(Texture2D, GBufferVelocityTexture)
 
+	//[Toon-Pipeline][Add-Begin] 增加ToonOutlineBuffer step1
+	SHADER_PARAMETER_RDG_TEXTURE(Texture2D, ToonOutlineTexture)
+	//[Toon-Pipeline][Add-End]
+
 	// SSAO
 	SHADER_PARAMETER_RDG_TEXTURE(Texture2D, ScreenSpaceAOTexture)
 

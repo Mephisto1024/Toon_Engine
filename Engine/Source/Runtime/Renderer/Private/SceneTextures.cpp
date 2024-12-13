@@ -20,6 +20,7 @@
 #include "PostProcess/PostProcessAmbientOcclusionMobile.h"
 #include "PostProcess/PostProcessPixelProjectedReflectionMobile.h"
 #include "IHeadMountedDisplayModule.h"
+#include "ScreenSpaceOutline.h"
 #include "Strata/Strata.h"
 
 static TAutoConsoleVariable<int32> CVarSceneTargetsResizeMethod(
@@ -523,6 +524,10 @@ void FSceneTextures::InitializeViewFamily(FRDGBuilder& GraphBuilder, FViewFamily
 		// Screen Space Ambient Occlusion
 		SceneTextures.ScreenSpaceAO = CreateScreenSpaceAOTexture(GraphBuilder, Config.Extent);
 
+		//[Toon-Pipeline][Add-Begin] 增加ToonOutlineBuffer step4
+		SceneTextures.ToonOutline = CreateToonOutlineTexture(GraphBuilder, Config.Extent , GFastVRamConfig.ToonOutline);
+		//[Toon-Pipeline][Add-End]
+		
 		// Small Depth
 		const FIntPoint SmallDepthExtent = GetDownscaledExtent(Config.Extent, Config.SmallDepthDownsampleFactor);
 		const FRDGTextureDesc SmallDepthDesc(FRDGTextureDesc::Create2D(SmallDepthExtent, PF_DepthStencil, FClearValueBinding::None, TexCreate_DepthStencilTargetable | TexCreate_ShaderResource));
@@ -822,6 +827,10 @@ void SetupSceneTextureUniformParameters(
 	SceneTextureParameters.GBufferETexture = SystemTextures.Black;
 	SceneTextureParameters.GBufferFTexture = SystemTextures.MidGrey;
 	SceneTextureParameters.GBufferVelocityTexture = SystemTextures.Black;
+	//[Toon-Pipeline][Add-Begin] 增加ToonOutlineBuffer step5
+	//初始化Texture
+	SceneTextureParameters.ToonOutlineTexture = SystemTextures.Black;
+	//[Toon-Pipeline][Add-End]
 	SceneTextureParameters.ScreenSpaceAOTexture = GetScreenSpaceAOFallback(SystemTextures);
 	SceneTextureParameters.CustomDepthTexture = SystemTextures.DepthDummy;
 	SceneTextureParameters.CustomStencilTexture = SystemTextures.StencilDummySRV;
@@ -879,6 +888,14 @@ void SetupSceneTextureUniformParameters(
 			SceneTextureParameters.GBufferVelocityTexture = SceneTextures->Velocity;
 		}
 
+		//[Toon-Pipeline][Add-Begin] 增加ToonOutlineBuffer step6
+		// 当有对应的SetupMode时，将SceneTextures的ToonBuffer与ToonBufferTexture绑定
+		if (EnumHasAnyFlags(SetupMode, ESceneTextureSetupMode::ToonOutline) && HasBeenProduced(SceneTextures->ToonOutline))
+		{
+			SceneTextureParameters.ToonOutlineTexture = SceneTextures->ToonOutline;
+		}
+		//[Toon-Pipeline][Add-End]
+		
 		if (EnumHasAnyFlags(SetupMode, ESceneTextureSetupMode::SSAO) && HasBeenProduced(SceneTextures->ScreenSpaceAO))
 		{
 			SceneTextureParameters.ScreenSpaceAOTexture = SceneTextures->ScreenSpaceAO;

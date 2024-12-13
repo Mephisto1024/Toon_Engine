@@ -1,0 +1,107 @@
+#include "Common.ush"
+
+Texture2D SceneDepthTexture;
+SamplerState PointClampSampler;
+
+void MainPS(
+    float4 SvPosition : SV_POSITION
+    , out float4 OutMultiplyColor : SV_Target0
+    )
+{
+    float2 UV = SvPositionToBufferUV(SvPosition);
+	
+    float2 Texsize = View.BufferSizeAndInvSize.zw;
+    
+    float2 offsets[9] =
+    {
+       float2(-1, 1),
+       float2( 0, 1),
+       float2( 1, 1),
+       float2(-1, 0),
+       float2( 0, 0),
+       float2( 1, 0),
+       float2(-1,-1),
+       float2( 0,-1),
+       float2( 1,-1)
+    };
+
+    // Sobel 算子核
+    static const int Gx[3][3] = {
+       { -1, 0, 1 },
+       { -2, 0, 2 },
+       { -1, 0, 1 }
+    };
+
+    static const int Gy[3][3] = {
+       {  1,  2,  1 },
+       {  0,  0,  0 },
+       { -1, -2, -1 }
+    };
+
+	int Mip = 0;
+	float4 s0 = SceneDepthTexture.SampleLevel(PointClampSampler, UV + offsets[0] * Texsize, Mip);
+	float4 s1 = SceneDepthTexture.SampleLevel(PointClampSampler, UV + offsets[1] * Texsize, Mip);
+	float4 s2 = SceneDepthTexture.SampleLevel(PointClampSampler, UV + offsets[2] * Texsize, Mip);
+	float4 s3 = SceneDepthTexture.SampleLevel(PointClampSampler, UV + offsets[3] * Texsize, Mip);
+	float4 s4 = SceneDepthTexture.SampleLevel(PointClampSampler, UV + offsets[4] * Texsize, Mip); //self
+	float4 s5 = SceneDepthTexture.SampleLevel(PointClampSampler, UV + offsets[5] * Texsize, Mip);
+	float4 s6 = SceneDepthTexture.SampleLevel(PointClampSampler, UV + offsets[6] * Texsize, Mip);
+	float4 s7 = SceneDepthTexture.SampleLevel(PointClampSampler, UV + offsets[7] * Texsize, Mip);
+	float4 s8 = SceneDepthTexture.SampleLevel(PointClampSampler, UV + offsets[8] * Texsize, Mip);
+
+	float4 ds0x = s0 * Gx[0][0];
+	float4 ds1x = s1 * Gx[0][1];
+	float4 ds2x = s2 * Gx[0][2];
+	float4 ds3x = s3 * Gx[1][0];
+	float4 ds4x = s4 * Gx[1][1];
+	float4 ds5x = s5 * Gx[1][2];
+	float4 ds6x = s6 * Gx[2][0];
+	float4 ds7x = s7 * Gx[2][1];
+	float4 ds8x = s8 * Gx[2][2];
+	float4 GX = ds0x + ds1x + ds2x + ds3x + ds4x + ds5x + ds6x + ds7x + ds8x;
+
+	float4 ds0y = s0 * Gy[0][0];
+	float4 ds1y = s1 * Gy[0][1];
+	float4 ds2y = s2 * Gy[0][2];
+	float4 ds3y = s3 * Gy[1][0];
+	float4 ds4y = s4 * Gy[1][1];
+	float4 ds5y = s5 * Gy[1][2];
+	float4 ds6y = s6 * Gy[2][0];
+	float4 ds7y = s7 * Gy[2][1];
+	float4 ds8y = s8 * Gy[2][2];
+	float4 GY = ds0y + ds1y + ds2y + ds3y + ds4y + ds5y + ds6y + ds7y + ds8y;
+
+	float4 LineMaskSobel = saturate(length(sqrt(GX * GX + GY * GY)));
+	float LineMask0 = saturate(1.8 - length(LineMaskSobel));
+
+	// Laplacian 算子核
+	float3x3 laplacianOperator = float3x3(-1, -1, -1,
+						  -1,  8, -1,
+						  -1, -1, -1);
+	// 高斯 算子核
+	float3x3 GaosiOperator = float3x3(-0.035316, -0.000016, -0.035316,
+   -0.000016, 0.08368  , -0.000016,
+   -0.035316, -0.000016, -0.035316);
+	
+	float4 fs0 = s0 * laplacianOperator[0][0];
+	float4 fs1 = s1 * laplacianOperator[0][1];
+	float4 fs2 = s2 * laplacianOperator[0][2];
+	float4 fs3 = s3 * laplacianOperator[1][0];
+	float4 fs4 = s4 * laplacianOperator[1][1];
+	float4 fs5 = s5 * laplacianOperator[1][2];
+	float4 fs6 = s6 * laplacianOperator[2][0];
+	float4 fs7 = s7 * laplacianOperator[2][1];
+	float4 fs8 = s8 * laplacianOperator[2][2];
+
+    float4 LineMaskLaplacian = fs0 + fs1 + fs2 + fs3 + fs4 + fs5 + fs6 + fs7 + fs8;
+    float LineMask1 = saturate(1- length(LineMaskLaplacian));
+
+    OutMultiplyColor = float4(pow(min(LineMask0, LineMask1), 80).rrr,1);
+	//OutMultiplyColor = float4( pow(LineMask0,8).rrr,1);
+	//OutMultiplyColor = float4( pow(LineMask1,180).rrr,1);
+	//OutMultiplyColor = float4(LineMask0, LineMask1, 0, 1); // 输出 LineMask 值作为颜色
+	//OutMultiplyColor = SceneDepthTexture.Sample(PointClampSampler, UV, 0);
+	//OutMultiplyColor = float4(UV.x, UV.y, 0, 1); // 输出 UV 坐标值
+	//OutMultiplyColor = float4(SvPosition.x, SvPosition.y, 0.0f, 1.0f); // 输出 UV 坐标值
+	//OutMultiplyColor = SceneDepthTexture.Sample(PointClampSampler, UV); // 直接输出纹理颜色
+}

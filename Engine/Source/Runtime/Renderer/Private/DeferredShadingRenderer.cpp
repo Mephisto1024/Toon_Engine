@@ -3616,7 +3616,6 @@ void FDeferredShadingSceneRenderer::Render(FRDGBuilder& GraphBuilder)
 
 			// VisualizeVirtualShadowMap TODO
 		}
-
 		// Extract emissive from SceneColor (before lighting is applied) + material diffuse and subsurface colors
 		FRDGTextureRef ExposureIlluminanceSetup = AddSetupExposureIlluminancePass(GraphBuilder, Views, SceneTextures);
 
@@ -3654,6 +3653,15 @@ void FDeferredShadingSceneRenderer::Render(FRDGBuilder& GraphBuilder)
 
 		VisualizeVolumetricLightmap(GraphBuilder, SceneTextures);
 
+		//[Toon-Pipeline][Add-Begin] 屏幕空间描边
+		{
+			RenderScreenSpaceOutLinePass(GraphBuilder,SceneTextures);
+		}
+		{
+			RenderOutlineCombinePass(GraphBuilder,SceneTextures);
+		}
+		//[Toon-Pipeline][Add-End]
+		
 		// Occlusion after base pass
 		if (!bOcclusionBeforeBasePass)
 		{
@@ -3929,7 +3937,9 @@ void FDeferredShadingSceneRenderer::Render(FRDGBuilder& GraphBuilder)
 #endif
 
 			//[Toon-Pipeline][Add-Begin] 增加描边Pass step21
-			RenderOutlinePass(GraphBuilder,SceneTextures);
+			{
+				RenderOutlinePass(GraphBuilder,SceneTextures);
+			}
 			//[Toon-Pipeline][Add-End]
 			
 			AddSubsurfacePass(GraphBuilder, SceneTextures, Views);

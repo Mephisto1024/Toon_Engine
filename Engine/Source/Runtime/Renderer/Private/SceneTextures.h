@@ -87,6 +87,10 @@ struct FSceneTextures : public FMinimalSceneTextures
 	FRDGTextureRef MobileLocalLightTextureA {};
 	FRDGTextureRef MobileLocalLightTextureB {};
 
+	//[Toon-Pipeline][Add-Begin] 增加ToonOutlineBuffer step3
+	FRDGTextureRef ToonOutline{};
+	//[Toon-Pipeline][Add-End]
+	
 	// Texture containing the screen space ambient occlusion result.
 	FRDGTextureRef ScreenSpaceAO{};
 
