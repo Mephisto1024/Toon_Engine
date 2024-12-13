@@ -17,10 +17,13 @@ void MainVS(
 	float3x3 TangentToLocal = VertexFactoryGetTangentToLocal(Input, VFIntermediates);
 	FMaterialVertexParameters VertexParameters = GetMaterialVertexParameters(Input, VFIntermediates, WorldPosition.xyz, TangentToLocal);
 	WorldPosition.xyz += GetMaterialWorldPositionOffset(VertexParameters);
-
+	half4 VertexColor = VertexParameters.VertexColor;
+	float3 SmoothWorldNormal = (VertexColor.xyz-0.5f) * 2.f;
+	float Scale = VertexColor.w;
+		
 	OutPos = mul(WorldPosition, ResolvedView.TranslatedWorldToClip);
 	float2 OffsetDir = normalize(mul(float4(WorldNormal, 1.0f), ResolvedView.TranslatedWorldToClip).xy);
-	float Length = clamp(0.0f, OutlineSize*4.0f, OutPos.w * OutlineSize*0.01 );
+	float Length = clamp(0.0f, 0.2f, OutPos.w * OutlineSize*0.1f);
 	OutPos.xy += OffsetDir * Length;
 }
 
