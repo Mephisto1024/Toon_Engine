@@ -359,10 +359,11 @@ public:
 	 */
 	void DebugLightGrid(FRDGBuilder& GraphBuilder, FSceneTextures& SceneTextures, bool bNeedLightGrid);
 
-	//[Toon-Pipeline][Add-Begin] 增加描边Pass step20 , 屏幕空间描边
+	//[Toon-Pipeline][Add-Begin] 增加描边Pass step20 , 屏幕空间描边 , ToonDataPass
 	void RenderOutlinePass(FRDGBuilder& GraphBuilder,FSceneTextures& SceneTextures);
 	void RenderScreenSpaceOutLinePass(FRDGBuilder& GraphBuilder, FSceneTextures& SceneTextures);
 	void RenderOutlineCombinePass(FRDGBuilder& GraphBuilder, FSceneTextures& SceneTextures);
+	void RenderToonDataPass(FRDGBuilder& GraphBuilder, FSceneTextures& SceneTextures);
 	//[Toon-Pipeline][Add-End]
 	
 	void RenderBasePass(

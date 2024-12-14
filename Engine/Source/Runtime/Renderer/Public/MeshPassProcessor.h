@@ -64,6 +64,10 @@ namespace EMeshPass
 		//[Toon-Pipeline][Add-Begin] 增加描边Pass step17-1
 		OutlinePass,
 		//[Toon-Pipeline][Add-End]
+
+		//[Toon-Pipeline][Add-Begin] 增加描边Pass step1-1
+		ToonDataPass,
+		//[Toon-Pipeline][Add-End]
 		
 #if WITH_EDITOR
 		HitProxy,
@@ -116,6 +120,9 @@ inline const TCHAR* GetMeshPassName(EMeshPass::Type MeshPass)
 	//[Toon-Pipeline][Add-Begin] 增加描边Pass step17-2
 	case EMeshPass::OutlinePass: return TEXT("OutlinePass");
 	//[Toon-Pipeline][Add-End]
+	//[Toon-Pipeline][Add-Begin] 增加ToonDataPass step1-2
+	case EMeshPass::ToonDataPass: return TEXT("ToonDataPass");
+	//[Toon-Pipeline][Add-End]
 #if WITH_EDITOR
 	case EMeshPass::HitProxy: return TEXT("HitProxy");
 	case EMeshPass::HitProxyOpaqueOnly: return TEXT("HitProxyOpaqueOnly");
@@ -132,7 +139,7 @@ inline const TCHAR* GetMeshPassName(EMeshPass::Type MeshPass)
 	
 	//[Toon-Pipeline][Add-Begin] 增加描边Pass step17-3
 #if WITH_EDITOR
-	static_assert(EMeshPass::Num == 30 + 4 + 1, "Need to update switch(MeshPass) after changing EMeshPass"); // GUID to prevent incorrect auto-resolves, please change when changing the expression: {A6E82589-44B3-4DAD-AC57-8AF6BD50DF43}
+	static_assert(EMeshPass::Num == 30 + 4 + 2, "Need to update switch(MeshPass) after changing EMeshPass"); // GUID to prevent incorrect auto-resolves, please change when changing the expression: {A6E82589-44B3-4DAD-AC57-8AF6BD50DF43}
 #else
 	static_assert(EMeshPass::Num == 30 + 1, "Need to update switch(MeshPass) after changing EMeshPass"); // GUID to prevent incorrect auto-resolves, please change when changing the expression: {A6E82589-44B3-4DAD-AC57-8AF6BD50DF43}
 #endif

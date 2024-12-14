@@ -3653,6 +3653,10 @@ void FDeferredShadingSceneRenderer::Render(FRDGBuilder& GraphBuilder)
 
 		VisualizeVolumetricLightmap(GraphBuilder, SceneTextures);
 
+		//[Toon-Pipeline][Add-Begin] 增加ToonDataPass step
+		RenderToonDataPass(GraphBuilder,SceneTextures);
+		//[Toon-Pipeline][Add-End]
+		
 		//[Toon-Pipeline][Add-Begin] 屏幕空间描边
 		{
 			RenderScreenSpaceOutLinePass(GraphBuilder,SceneTextures);
