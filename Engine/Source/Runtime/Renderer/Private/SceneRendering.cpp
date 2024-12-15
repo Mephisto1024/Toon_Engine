@@ -434,6 +434,11 @@ FASTVRAM_CVAR(SeparateTranslucencyModulate, 0);
 //[Toon-Pipeline][Add-Begin] 增加ToonOutlineBuffer step9-1
 FASTVRAM_CVAR(ToonOutline,0);
 //[Toon-Pipeline][Add-End]
+//[Toon-Pipeline][Add-Begin] 增加ToonDataBuffer step9-1
+FASTVRAM_CVAR(ToonOutlineData,0);
+FASTVRAM_CVAR(ToonShadowData,0);
+FASTVRAM_CVAR(ToonCustomData,0);
+//[Toon-Pipeline][Add-End]
 FASTVRAM_CVAR(ScreenSpaceAO,0);
 FASTVRAM_CVAR(SSR, 0);
 FASTVRAM_CVAR(DBufferA, 0);
@@ -642,6 +647,11 @@ void FFastVramConfig::Update()
 	bDirty |= UpdateTextureFlagFromCVar(CVarFastVRam_SeparateTranslucencyModulate, SeparateTranslucencyModulate);
 	//[Toon-Pipeline][Add-Begin] 增加ToonOutlineBuffer step9-2
 	bDirty |= UpdateTextureFlagFromCVar(CVarFastVRam_ToonOutline, ToonOutline);
+	//[Toon-Pipeline][Add-End]
+	//[Toon-Pipeline][Add-Begin] 增加ToonDataBuffer step9-2
+	bDirty |= UpdateTextureFlagFromCVar(CVarFastVRam_ToonOutlineData, ToonOutlineData);
+	bDirty |= UpdateTextureFlagFromCVar(CVarFastVRam_ToonShadowData, ToonShadowData);
+	bDirty |= UpdateTextureFlagFromCVar(CVarFastVRam_ToonCustomData, ToonCustomData);
 	//[Toon-Pipeline][Add-End]
 	bDirty |= UpdateTextureFlagFromCVar(CVarFastVRam_ScreenSpaceAO, ScreenSpaceAO);
 	bDirty |= UpdateTextureFlagFromCVar(CVarFastVRam_SSR, SSR);

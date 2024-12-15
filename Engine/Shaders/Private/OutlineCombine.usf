@@ -1,7 +1,8 @@
 #include "Common.ush"
 
-Texture2D GBufferC;
+Texture2D BaseColorTexture;
 Texture2D ToonOutlineTexture;
+Texture2D ToonOutlineDataTexture;
 SamplerState PointClampSampler;
 
 void MainPS(
@@ -10,8 +11,10 @@ void MainPS(
     )
 {
     float2 UV = SvPositionToBufferUV(SvPosition);
-	float3 BaseColor = GBufferC.Sample(PointClampSampler, UV, 0).rgb;
+	float3 BaseColor = BaseColorTexture.Sample(PointClampSampler, UV, 0).rgb;
+	float3 OutlineColor = ToonOutlineDataTexture.Sample(PointClampSampler, UV, 0).rgb;
+	OutlineColor = Pow3(OutlineColor) * 0.3;
 	float Mask = ToonOutlineTexture.Sample(PointClampSampler, UV, 0).r;
 	//Mask = smoothstep(0.9,1,Mask);
-    OutColor = float4( lerp(0.0f,BaseColor,Mask),0);
+    OutColor = float4( lerp(OutlineColor,BaseColor,Mask),0);
 }

@@ -15,7 +15,7 @@ public:
 	static void ModifyCompilationEnvironment(const FGlobalShaderPermutationParameters& Parameters, FShaderCompilerEnvironment& OutEnvironment)
 	{
 		OutEnvironment.CompilerFlags.Add(CFLAG_ForceOptimization);
-		OutEnvironment.SetDefine(TEXT("ScreenSpaceOutLine_1"), 1);
+		OutEnvironment.SetDefine(TEXT("ScreenSpaceOutLine"), 1);
 	}
 
 	static bool ShouldCache(EShaderPlatform Platform)
@@ -30,6 +30,8 @@ public:
 
 	BEGIN_SHADER_PARAMETER_STRUCT(FParameters, )
 	   SHADER_PARAMETER_RDG_TEXTURE(Texture2D, SceneDepthTexture)
+		SHADER_PARAMETER_RDG_TEXTURE(Texture2D, NormalTexture)
+	   SHADER_PARAMETER_RDG_TEXTURE(Texture2D, ToonOutlineDataTexture)
 	   SHADER_PARAMETER_SAMPLER(SamplerState, PointClampSampler)
 	   RENDER_TARGET_BINDING_SLOTS()
 	END_SHADER_PARAMETER_STRUCT()
@@ -58,10 +60,11 @@ public:
 	}
 
 	BEGIN_SHADER_PARAMETER_STRUCT(FParameters, )
-	   SHADER_PARAMETER_RDG_TEXTURE(Texture2D, GBufferC)
-	   SHADER_PARAMETER_RDG_TEXTURE(Texture2D, ToonOutlineTexture)
-	   SHADER_PARAMETER_SAMPLER(SamplerState, PointClampSampler)
-	   RENDER_TARGET_BINDING_SLOTS()
+		SHADER_PARAMETER_RDG_TEXTURE(Texture2D, BaseColorTexture)
+		SHADER_PARAMETER_RDG_TEXTURE(Texture2D, ToonOutlineTexture)
+		SHADER_PARAMETER_RDG_TEXTURE(Texture2D, ToonOutlineDataTexture)
+		SHADER_PARAMETER_SAMPLER(SamplerState, PointClampSampler)
+		RENDER_TARGET_BINDING_SLOTS()
 	END_SHADER_PARAMETER_STRUCT()
 };
 

@@ -139,10 +139,22 @@ FToonMeshPassParameters* GetToonPassParameters(FRDGBuilder& GraphBuilder, const 
 {
     FToonMeshPassParameters* PassParameters = GraphBuilder.AllocParameters<FToonMeshPassParameters>();
     PassParameters->View = View.ViewUniformBuffer;
-	// 设置RenderTarget
-    PassParameters->RenderTargets[0] = FRenderTargetBinding(SceneTextures.Color.Target, ERenderTargetLoadAction::ELoad);
-    // PassParameters->RenderTargets.DepthStencil = FDepthStencilBinding(SceneTextures.Depth.Target, ERenderTargetLoadAction::ELoad, ERenderTargetLoadAction::ELoad, FExclusiveDepthStencil::DepthWrite_StencilWrite);
-    return PassParameters;
+	
+	if (!HasBeenProduced(SceneTextures.ToonOutlineData))
+	{
+		// 如果ToonBuffer没被创建，在这里创建
+		const FSceneTexturesConfig& Config = View.GetSceneTexturesConfig();
+		SceneTextures.ToonOutlineData = CreateToonOutlineDataTexture(GraphBuilder, Config.Extent, GFastVRamConfig.ToonOutlineData);
+		SceneTextures.ToonShadowData = CreateToonShadowDataTexture(GraphBuilder, Config.Extent, GFastVRamConfig.ToonShadowData);
+		SceneTextures.ToonCustomData = CreateToonCustomDataTexture(GraphBuilder, Config.Extent, GFastVRamConfig.ToonCustomData);
+	}
+	//PassParameters->RenderTargets[0] = FRenderTargetBinding(SceneTextures.Color.Target, ERenderTargetLoadAction::ELoad);
+	PassParameters->RenderTargets[0] = FRenderTargetBinding(SceneTextures.ToonOutlineData, ERenderTargetLoadAction::EClear);
+	PassParameters->RenderTargets[1] = FRenderTargetBinding(SceneTextures.ToonShadowData, ERenderTargetLoadAction::EClear);
+	PassParameters->RenderTargets[2] = FRenderTargetBinding(SceneTextures.ToonCustomData, ERenderTargetLoadAction::EClear);
+	PassParameters->RenderTargets.DepthStencil = FDepthStencilBinding(SceneTextures.Depth.Target, ERenderTargetLoadAction::ELoad, ERenderTargetLoadAction::ELoad, FExclusiveDepthStencil::DepthWrite_StencilWrite);
+
+	return PassParameters;
 }
 // 在DeferredShadingSceneRenderer调用这个函数来渲染ToonPass
 void FDeferredShadingSceneRenderer::RenderToonDataPass(FRDGBuilder& GraphBuilder, FSceneTextures& SceneTextures)
@@ -173,3 +185,32 @@ void FDeferredShadingSceneRenderer::RenderToonDataPass(FRDGBuilder& GraphBuilder
         }
     }
 }
+
+//[Toon-Pipeline][Add-Begin] 增加ToonDataBuffer step3
+FRDGTextureDesc GetToonOutlineDataTextureDesc(FIntPoint Extent, ETextureCreateFlags CreateFlags)
+{
+	return FRDGTextureDesc(FRDGTextureDesc::Create2D(Extent, PF_B8G8R8A8, FClearValueBinding::Black, TexCreate_UAV | TexCreate_RenderTargetable | TexCreate_ShaderResource | CreateFlags));
+}
+FRDGTextureRef CreateToonOutlineDataTexture(FRDGBuilder& GraphBuilder, FIntPoint Extent,ETextureCreateFlags CreateFlags)
+{
+	return GraphBuilder.CreateTexture(GetToonOutlineDataTextureDesc(Extent, CreateFlags), TEXT("ToonOutlineDataTexture"));
+}
+
+FRDGTextureDesc GetToonShadowDataTextureDesc(FIntPoint Extent, ETextureCreateFlags CreateFlags)
+{
+	return FRDGTextureDesc(FRDGTextureDesc::Create2D(Extent, PF_B8G8R8A8, FClearValueBinding::Black, TexCreate_UAV | TexCreate_RenderTargetable | TexCreate_ShaderResource | CreateFlags));
+}
+FRDGTextureRef CreateToonShadowDataTexture(FRDGBuilder& GraphBuilder, FIntPoint Extent,ETextureCreateFlags CreateFlags)
+{
+	return GraphBuilder.CreateTexture(GetToonShadowDataTextureDesc(Extent, CreateFlags), TEXT("ToonShadowDataTexture"));
+}
+
+FRDGTextureDesc GetToonCustomDataTextureDesc(FIntPoint Extent, ETextureCreateFlags CreateFlags)
+{
+	return FRDGTextureDesc(FRDGTextureDesc::Create2D(Extent, PF_B8G8R8A8, FClearValueBinding::Black, TexCreate_UAV | TexCreate_RenderTargetable | TexCreate_ShaderResource | CreateFlags));
+}
+FRDGTextureRef CreateToonCustomDataTexture(FRDGBuilder& GraphBuilder, FIntPoint Extent,ETextureCreateFlags CreateFlags)
+{
+	return GraphBuilder.CreateTexture(GetToonCustomDataTextureDesc(Extent, CreateFlags), TEXT("ToonCustomDataTexture"));
+}
+//[Toon-Pipeline][Add-End]

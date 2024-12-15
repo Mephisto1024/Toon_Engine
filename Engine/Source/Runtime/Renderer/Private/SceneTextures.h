@@ -90,6 +90,12 @@ struct FSceneTextures : public FMinimalSceneTextures
 	//[Toon-Pipeline][Add-Begin] 增加ToonOutlineBuffer step3
 	FRDGTextureRef ToonOutline{};
 	//[Toon-Pipeline][Add-End]
+
+	//[Toon-Pipeline][Add-Begin] 增加ToonDataBuffer step2
+	FRDGTextureRef ToonOutlineData{};
+	FRDGTextureRef ToonShadowData{};
+	FRDGTextureRef ToonCustomData{};
+	//[Toon-Pipeline][Add-End]
 	
 	// Texture containing the screen space ambient occlusion result.
 	FRDGTextureRef ScreenSpaceAO{};

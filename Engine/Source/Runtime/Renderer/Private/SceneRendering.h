@@ -2771,6 +2771,11 @@ struct FFastVramConfig
 	//[Toon-Pipeline][Add-Begin] 增加ToonOutlineBuffer step7
 	ETextureCreateFlags ToonOutline;
 	//[Toon-Pipeline][Add-End]
+	//[Toon-Pipeline][Add-Begin] 增加ToonDataBuffer step7
+	ETextureCreateFlags ToonOutlineData;
+	ETextureCreateFlags ToonShadowData;
+	ETextureCreateFlags ToonCustomData;
+	//[Toon-Pipeline][Add-End]
 	ETextureCreateFlags ScreenSpaceAO;
 	ETextureCreateFlags SSR;
 	ETextureCreateFlags DBufferA;

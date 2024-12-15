@@ -1,8 +1,58 @@
 #include "Common.ush"
 
 Texture2D SceneDepthTexture;
+Texture2D NormalTexture;
+Texture2D ToonOutlineDataTexture;
 SamplerState PointClampSampler;
 
+float4 SampleScreenSpaceNormal(float2 UV)
+{
+	float4 WorldSpaceNormal = NormalTexture.SampleLevel(PointClampSampler,UV,0)*2-1;
+
+	ResolvedView = ResolveView();
+	float4 ScreenSpaceNormal = mul(WorldSpaceNormal , ResolvedView.TranslatedWorldToView);
+	ScreenSpaceNormal = ScreenSpaceNormal*0.5 +0.5;
+	return ScreenSpaceNormal;
+}
+float Sobel(float4 s0,float4 s1,float4 s2,float4 s3,float4 s4,float4 s5,float4 s6,float4 s7,float4 s8,float threshold)
+{
+	static const int Gx[3][3] = {
+		{ -1, 0, 1 },
+		{ -2, 0, 2 },
+		{ -1, 0, 1 }
+	};
+
+	static const int Gy[3][3] = {
+		{  1,  2,  1 },
+		{  0,  0,  0 },
+		{ -1, -2, -1 }
+	};
+	float4 ds0x = s0 * Gx[0][0];
+	float4 ds1x = s1 * Gx[0][1];
+	float4 ds2x = s2 * Gx[0][2];
+	float4 ds3x = s3 * Gx[1][0];
+	float4 ds4x = s4 * Gx[1][1];
+	float4 ds5x = s5 * Gx[1][2];
+	float4 ds6x = s6 * Gx[2][0];
+	float4 ds7x = s7 * Gx[2][1];
+	float4 ds8x = s8 * Gx[2][2];
+	float4 GX = ds0x + ds1x + ds2x + ds3x + ds4x + ds5x + ds6x + ds7x + ds8x;
+
+	float4 ds0y = s0 * Gy[0][0];
+	float4 ds1y = s1 * Gy[0][1];
+	float4 ds2y = s2 * Gy[0][2];
+	float4 ds3y = s3 * Gy[1][0];
+	float4 ds4y = s4 * Gy[1][1];
+	float4 ds5y = s5 * Gy[1][2];
+	float4 ds6y = s6 * Gy[2][0];
+	float4 ds7y = s7 * Gy[2][1];
+	float4 ds8y = s8 * Gy[2][2];
+	float4 GY = ds0y + ds1y + ds2y + ds3y + ds4y + ds5y + ds6y + ds7y + ds8y;
+
+	float4 LineMaskSobel = saturate(length(sqrt(GX * GX + GY * GY)));
+	float LineMask0 = saturate(threshold - length(LineMaskSobel));
+	return  LineMask0;
+}
 void MainPS(
     float4 SvPosition : SV_POSITION
     , out float4 OutMultiplyColor : SV_Target0
@@ -11,7 +61,9 @@ void MainPS(
     float2 UV = SvPositionToBufferUV(SvPosition);
 	
     float2 Texsize = View.BufferSizeAndInvSize.zw;
-    
+	
+    float OutlineThickness = ToonOutlineDataTexture.SampleLevel(PointClampSampler, UV, 0).a;
+	
     float2 offsets[9] =
     {
        float2(-1, 1),
@@ -38,17 +90,27 @@ void MainPS(
        { -1, -2, -1 }
     };
 
-	int Mip = 0;
-	float4 s0 = SceneDepthTexture.SampleLevel(PointClampSampler, UV + offsets[0] * Texsize, Mip);
-	float4 s1 = SceneDepthTexture.SampleLevel(PointClampSampler, UV + offsets[1] * Texsize, Mip);
-	float4 s2 = SceneDepthTexture.SampleLevel(PointClampSampler, UV + offsets[2] * Texsize, Mip);
-	float4 s3 = SceneDepthTexture.SampleLevel(PointClampSampler, UV + offsets[3] * Texsize, Mip);
-	float4 s4 = SceneDepthTexture.SampleLevel(PointClampSampler, UV + offsets[4] * Texsize, Mip); //self
-	float4 s5 = SceneDepthTexture.SampleLevel(PointClampSampler, UV + offsets[5] * Texsize, Mip);
-	float4 s6 = SceneDepthTexture.SampleLevel(PointClampSampler, UV + offsets[6] * Texsize, Mip);
-	float4 s7 = SceneDepthTexture.SampleLevel(PointClampSampler, UV + offsets[7] * Texsize, Mip);
-	float4 s8 = SceneDepthTexture.SampleLevel(PointClampSampler, UV + offsets[8] * Texsize, Mip);
+	
+	float4 s0 = SceneDepthTexture.SampleLevel(PointClampSampler, UV + offsets[0] * Texsize * OutlineThickness, 0);
+	float4 s1 = SceneDepthTexture.SampleLevel(PointClampSampler, UV + offsets[1] * Texsize * OutlineThickness, 0);
+	float4 s2 = SceneDepthTexture.SampleLevel(PointClampSampler, UV + offsets[2] * Texsize * OutlineThickness, 0);
+	float4 s3 = SceneDepthTexture.SampleLevel(PointClampSampler, UV + offsets[3] * Texsize * OutlineThickness, 0);
+	float4 s4 = SceneDepthTexture.SampleLevel(PointClampSampler, UV + offsets[4] * Texsize * OutlineThickness, 0);
+	float4 s5 = SceneDepthTexture.SampleLevel(PointClampSampler, UV + offsets[5] * Texsize * OutlineThickness, 0);
+	float4 s6 = SceneDepthTexture.SampleLevel(PointClampSampler, UV + offsets[6] * Texsize * OutlineThickness, 0);
+	float4 s7 = SceneDepthTexture.SampleLevel(PointClampSampler, UV + offsets[7] * Texsize * OutlineThickness, 0);
+	float4 s8 = SceneDepthTexture.SampleLevel(PointClampSampler, UV + offsets[8] * Texsize * OutlineThickness, 0);
 
+	float4 ns0 = SampleScreenSpaceNormal(UV + offsets[0] * Texsize * OutlineThickness);
+	float4 ns1 = SampleScreenSpaceNormal(UV + offsets[1] * Texsize * OutlineThickness);
+	float4 ns2 = SampleScreenSpaceNormal(UV + offsets[2] * Texsize * OutlineThickness);
+	float4 ns3 = SampleScreenSpaceNormal(UV + offsets[3] * Texsize * OutlineThickness);
+	float4 ns4 = SampleScreenSpaceNormal(UV + offsets[4] * Texsize * OutlineThickness);
+	float4 ns5 = SampleScreenSpaceNormal(UV + offsets[5] * Texsize * OutlineThickness);
+	float4 ns6 = SampleScreenSpaceNormal(UV + offsets[6] * Texsize * OutlineThickness);
+	float4 ns7 = SampleScreenSpaceNormal(UV + offsets[7] * Texsize * OutlineThickness);
+	float4 ns8 = SampleScreenSpaceNormal(UV + offsets[8] * Texsize * OutlineThickness);
+	
 	float4 ds0x = s0 * Gx[0][0];
 	float4 ds1x = s1 * Gx[0][1];
 	float4 ds2x = s2 * Gx[0][2];
@@ -72,8 +134,11 @@ void MainPS(
 	float4 GY = ds0y + ds1y + ds2y + ds3y + ds4y + ds5y + ds6y + ds7y + ds8y;
 
 	float4 LineMaskSobel = saturate(length(sqrt(GX * GX + GY * GY)));
-	float LineMask0 = saturate(1.8 - length(LineMaskSobel));
-
+	float LineMask0 = saturate(1.5 - length(LineMaskSobel));
+	LineMask0 = pow(LineMask0,8);
+	float Line_Sobel_Depth = Sobel(s0,s1,s2,s3,s4,s5,s6,s7,s8,1);
+	float Line_Sobel_Normal = Sobel(ns0,ns1,ns2,ns3,ns4,ns5,ns6,ns7,ns8,1.8);
+	
 	// Laplacian 算子核
 	float3x3 laplacianOperator = float3x3(-1, -1, -1,
 						  -1,  8, -1,
@@ -93,15 +158,20 @@ void MainPS(
 	float4 fs7 = s7 * laplacianOperator[2][1];
 	float4 fs8 = s8 * laplacianOperator[2][2];
 
-    float4 LineMaskLaplacian = fs0 + fs1 + fs2 + fs3 + fs4 + fs5 + fs6 + fs7 + fs8;
-    float LineMask1 = saturate(1- length(LineMaskLaplacian));
+    float4 LineMaskLaplacian_Depth = fs0 + fs1 + fs2 + fs3 + fs4 + fs5 + fs6 + fs7 + fs8;
+    float LineMask1 = saturate(1- length(LineMaskLaplacian_Depth));
+	LineMask1 = pow(LineMask1,50);
+	float4 LineMaskLaplacian_Normal = ns4 * 8-(ns0 + ns1 + ns2 + ns3  + ns5 + ns6 + ns7 + ns8);
+	float LineMask2 = saturate(2- length(LineMaskLaplacian_Normal));
 
-    OutMultiplyColor = float4(pow(min(LineMask0, LineMask1), 80).rrr,1);
-	//OutMultiplyColor = float4( pow(LineMask0,8).rrr,1);
-	//OutMultiplyColor = float4( pow(LineMask1,180).rrr,1);
-	//OutMultiplyColor = float4(LineMask0, LineMask1, 0, 1); // 输出 LineMask 值作为颜色
-	//OutMultiplyColor = SceneDepthTexture.Sample(PointClampSampler, UV, 0);
-	//OutMultiplyColor = float4(UV.x, UV.y, 0, 1); // 输出 UV 坐标值
-	//OutMultiplyColor = float4(SvPosition.x, SvPosition.y, 0.0f, 1.0f); // 输出 UV 坐标值
-	//OutMultiplyColor = SceneDepthTexture.Sample(PointClampSampler, UV); // 直接输出纹理颜色
+	
+	float LineMask = min(LineMask0, LineMask1);
+	//LineMask = min(LineMask, LineMask2);
+	
+    OutMultiplyColor = float4(LineMask.rrr,1);
+	//OutMultiplyColor = float4( pow(Line_Sobel_Normal,1).rrr,1);
+	//OutMultiplyColor = float4( pow(LineMask1,80).rrr,1);
+	//OutMultiplyColor = float4( pow(LineMask2,1).rrr,1);
+
+	//OutMultiplyColor =SampleScreenSpaceNormal(UV);
 }

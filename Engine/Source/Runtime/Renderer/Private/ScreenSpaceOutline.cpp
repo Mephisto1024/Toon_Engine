@@ -21,6 +21,8 @@ void FDeferredShadingSceneRenderer::RenderScreenSpaceOutLinePass(FRDGBuilder& Gr
 		//GetScreenSpaceOutLineParameters--Start
 		FScreenSpaceOutLinePS::FParameters* PassParameters = GraphBuilder.AllocParameters<FScreenSpaceOutLinePS::FParameters>();
 		PassParameters->SceneDepthTexture = SceneTextures.Depth.Target;
+		PassParameters->NormalTexture = SceneTextures.GBufferA;
+		PassParameters->ToonOutlineDataTexture = SceneTextures.ToonOutlineData;
 		PassParameters->PointClampSampler = TStaticSamplerState<SF_Point>::GetRHI();
 		if (!HasBeenProduced(SceneTextures.ToonOutline))
 		{
@@ -95,8 +97,9 @@ void FDeferredShadingSceneRenderer::RenderOutlineCombinePass(FRDGBuilder& GraphB
 		
 		//GetScreenSpaceOutLineParameters--Start
 		FOutlineCombinePS::FParameters* PassParameters = GraphBuilder.AllocParameters<FOutlineCombinePS::FParameters>();
-		PassParameters->GBufferC = SceneTextures.GBufferC;
+		PassParameters->BaseColorTexture = SceneTextures.GBufferC;
 		PassParameters->ToonOutlineTexture = SceneTextures.ToonOutline;
+		PassParameters->ToonOutlineDataTexture = SceneTextures.ToonOutlineData;
 		PassParameters->PointClampSampler = TStaticSamplerState<SF_Point>::GetRHI();
 		
 		PassParameters->RenderTargets[0] = FRenderTargetBinding(SceneTextures.GBufferC, ERenderTargetLoadAction::ELoad);
@@ -113,7 +116,7 @@ void FDeferredShadingSceneRenderer::RenderOutlineCombinePass(FRDGBuilder& GraphB
 		   {
 			  check(PixelShader.IsValid());
 		   	  RHICmdList.SetViewport((float)View.ViewRect.Min.X, (float)View.ViewRect.Min.Y, 0.0f, (float)View.ViewRect.Max.X, (float)View.ViewRect.Max.Y, 1.0f);
-		   	
+		   	  
 			  FGraphicsPipelineStateInitializer GraphicsPSOInit;
 			  FPixelShaderUtils::InitFullscreenPipelineState(RHICmdList, View.ShaderMap, PixelShader, /* out */GraphicsPSOInit);
 			  GraphicsPSOInit.BlendState = TStaticBlendState<>::GetRHI();

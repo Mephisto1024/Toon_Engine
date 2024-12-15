@@ -126,3 +126,12 @@ private:
 
 	FMeshPassProcessorRenderState PassDrawRenderState;
 };
+
+FRDGTextureDesc GetToonOutlineDataTextureDesc(FIntPoint Extent, ETextureCreateFlags CreateFlags);
+FRDGTextureRef CreateToonOutlineDataTexture(FRDGBuilder& GraphBuilder, FIntPoint Extent, ETextureCreateFlags CreateFlags);
+
+FRDGTextureDesc GetToonShadowDataTextureDesc(FIntPoint Extent, ETextureCreateFlags CreateFlags);
+FRDGTextureRef CreateToonShadowDataTexture(FRDGBuilder& GraphBuilder, FIntPoint Extent, ETextureCreateFlags CreateFlags);
+
+FRDGTextureDesc GetToonCustomDataTextureDesc(FIntPoint Extent, ETextureCreateFlags CreateFlags);
+FRDGTextureRef CreateToonCustomDataTexture(FRDGBuilder& GraphBuilder, FIntPoint Extent, ETextureCreateFlags CreateFlags);

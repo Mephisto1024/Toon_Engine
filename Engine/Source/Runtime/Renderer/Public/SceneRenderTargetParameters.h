@@ -46,8 +46,15 @@ enum class ESceneTextureSetupMode : uint32
 	//[Toon-Pipeline][Add-Begin] 增加ToonOutlineBuffer step8
 	ToonOutline		= 1 << 11,
 	//[Toon-Pipeline][Add-End]
+
+	//[Toon-Pipeline][Add-Begin] 增加ToonDataBuffer step8
+	ToonOutlineData = 1 << 12,
+	ToonShadowData  = 1 << 13,
+	ToonCustomData  = 1 << 14,
+	Toon			= ToonOutline | ToonOutlineData | ToonShadowData | ToonCustomData,
+	//[Toon-Pipeline][Add-End]
 	GBuffers		= GBufferA | GBufferB | GBufferC | GBufferD | GBufferE | GBufferF,
-	All				= SceneColor | SceneDepth | SceneVelocity | GBuffers | SSAO | CustomDepth | ToonOutline
+	All				= SceneColor | SceneDepth | SceneVelocity | GBuffers | SSAO | CustomDepth | Toon
 };
 ENUM_CLASS_FLAGS(ESceneTextureSetupMode);
 

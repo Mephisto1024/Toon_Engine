@@ -30,17 +30,50 @@ void MainVS(
 
 	FMaterialVertexParameters VertexParameters = GetMaterialVertexParameters(Input, VFIntermediates, WorldPos.xyz, TangentToLocal);
 	WorldPos.xyz += GetMaterialWorldPositionOffset(VertexParameters);
-
+	WorldPos.xyz +=WorldNormal*0.1;
+	
 	float4 RasterizedWorldPosition = VertexFactoryGetRasterizedWorldPosition(Input, VFIntermediates, WorldPos);
 	ClipSpacePosition = mul(RasterizedWorldPosition, ResolvedView.TranslatedWorldToClip);
 	Output.SvPosition = INVARIANT(ClipSpacePosition);
 	Output.FactoryInterpolants = VertexFactoryGetInterpolantsVSToPS(Input, VFIntermediates, VertexParameters);
 }
 
+// Toon Buffer step 9
+// 设置RenderTarget
 void MainPS(
 	FSimpleMeshPassVSToPS In,
-	out float4 OutColor : SV_Target0)
+	out float4 OutToonOutlineData : SV_Target0,
+	out float4 OutToonShadowData : SV_Target1,
+	out float4 OutToonCustomData : SV_Target2)
 {
-	float3 Color = float3(1.0, 0.0, 0.0);
-	OutColor = float4(OutColor.r,OutColor.g,OutColor.b, 1.0);
+	// 获取像素的材质参数(此处的材质就是材质辑器编辑出来的材质).
+	FMaterialPixelParameters MaterialParameters = GetMaterialPixelParameters(In.FactoryInterpolants, In.SvPosition);
+	
+	float4 VertexColor = MaterialParameters.VertexColor;
+	float VertexColorAlpha = VertexColor.a;
+	float3 Color3 = float3(0.0, 0.0, 1.0);
+	
+	float3 OutlineColor = float3(0.0, 0.0, 0.0);
+	float OutlineThickness = VertexColorAlpha;
+	float4 OutlineData = float4(OutlineColor,OutlineThickness);
+	
+	float3 ShadowColor = float3(0.0, 0.0, 0.0);
+	float ShadowOffset = 0.0;
+	float4 ShadowData = float4(ShadowColor,ShadowOffset);
+	
+	// FPixelMaterialInputs用于获取材质编辑器的针脚
+	// FPixelMaterialInputs PixelMaterialInputs;
+#ifdef  HAVE_GetToonMaterialOutput0
+	OutlineData = LWCToFloat(GetToonMaterialOutput0(MaterialParameters));
+#endif
+#ifdef  HAVE_GetToonMaterialOutput1
+	ShadowData = LWCToFloat(GetToonMaterialOutput1(MaterialParameters));
+#endif
+#ifdef  HAVE_GetToonMaterialOutput2
+	Color3 = LWCToFloat(GetToonMaterialOutput2(MaterialParameters));
+#endif
+	
+	OutToonOutlineData = OutlineData;
+	OutToonShadowData = ShadowData;
+	OutToonCustomData = ShadowData;
 }

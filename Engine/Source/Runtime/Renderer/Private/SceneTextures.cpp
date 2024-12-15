@@ -21,6 +21,7 @@
 #include "PostProcess/PostProcessPixelProjectedReflectionMobile.h"
 #include "IHeadMountedDisplayModule.h"
 #include "ScreenSpaceOutline.h"
+#include "ToonDataPassRendering.h"
 #include "Strata/Strata.h"
 
 static TAutoConsoleVariable<int32> CVarSceneTargetsResizeMethod(
@@ -528,6 +529,12 @@ void FSceneTextures::InitializeViewFamily(FRDGBuilder& GraphBuilder, FViewFamily
 		SceneTextures.ToonOutline = CreateToonOutlineTexture(GraphBuilder, Config.Extent , GFastVRamConfig.ToonOutline);
 		//[Toon-Pipeline][Add-End]
 		
+		//[Toon-Pipeline][Add-Begin] 增加ToonDataBuffer step4
+		SceneTextures.ToonOutlineData = CreateToonOutlineDataTexture(GraphBuilder, Config.Extent , GFastVRamConfig.ToonOutlineData);
+		SceneTextures.ToonShadowData = CreateToonShadowDataTexture(GraphBuilder, Config.Extent , GFastVRamConfig.ToonShadowData);
+		SceneTextures.ToonCustomData = CreateToonCustomDataTexture(GraphBuilder, Config.Extent , GFastVRamConfig.ToonCustomData);
+		//[Toon-Pipeline][Add-End]
+		
 		// Small Depth
 		const FIntPoint SmallDepthExtent = GetDownscaledExtent(Config.Extent, Config.SmallDepthDownsampleFactor);
 		const FRDGTextureDesc SmallDepthDesc(FRDGTextureDesc::Create2D(SmallDepthExtent, PF_DepthStencil, FClearValueBinding::None, TexCreate_DepthStencilTargetable | TexCreate_ShaderResource));
@@ -831,6 +838,13 @@ void SetupSceneTextureUniformParameters(
 	//初始化Texture
 	SceneTextureParameters.ToonOutlineTexture = SystemTextures.Black;
 	//[Toon-Pipeline][Add-End]
+
+	//[Toon-Pipeline][Add-Begin] 增加ToonDataBuffer step5
+	SceneTextureParameters.ToonOutlineDataTexture = SystemTextures.Black;
+	SceneTextureParameters.ToonShadowDataTexture = SystemTextures.Black;
+	SceneTextureParameters.ToonCustomDataTexture = SystemTextures.Black;
+	//[Toon-Pipeline][Add-End]
+	
 	SceneTextureParameters.ScreenSpaceAOTexture = GetScreenSpaceAOFallback(SystemTextures);
 	SceneTextureParameters.CustomDepthTexture = SystemTextures.DepthDummy;
 	SceneTextureParameters.CustomStencilTexture = SystemTextures.StencilDummySRV;
@@ -893,6 +907,21 @@ void SetupSceneTextureUniformParameters(
 		if (EnumHasAnyFlags(SetupMode, ESceneTextureSetupMode::ToonOutline) && HasBeenProduced(SceneTextures->ToonOutline))
 		{
 			SceneTextureParameters.ToonOutlineTexture = SceneTextures->ToonOutline;
+		}
+		//[Toon-Pipeline][Add-End]
+
+		//[Toon-Pipeline][Add-Begin] 增加ToonDataBuffer step6
+		if (EnumHasAnyFlags(SetupMode, ESceneTextureSetupMode::ToonOutlineData) && HasBeenProduced(SceneTextures->ToonOutlineData))
+		{
+			SceneTextureParameters.ToonOutlineDataTexture = SceneTextures->ToonOutlineData;
+		}
+		if (EnumHasAnyFlags(SetupMode, ESceneTextureSetupMode::ToonShadowData) && HasBeenProduced(SceneTextures->ToonShadowData))
+		{
+			SceneTextureParameters.ToonShadowDataTexture = SceneTextures->ToonShadowData;
+		}
+		if (EnumHasAnyFlags(SetupMode, ESceneTextureSetupMode::ToonCustomData) && HasBeenProduced(SceneTextures->ToonCustomData))
+		{
+			SceneTextureParameters.ToonCustomDataTexture = SceneTextures->ToonCustomData;
 		}
 		//[Toon-Pipeline][Add-End]
 		
