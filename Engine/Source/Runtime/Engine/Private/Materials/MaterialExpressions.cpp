@@ -209,6 +209,9 @@
 //[Toon-Pipeline][Add-Begin] 增加ToonMaterialOutput节点 step1
 #include "Materials/MaterialExpressionToonMaterialOutput.h"
 //[Toon-Pipeline][Add-End]
+//[Toon-Pipeline][Add-Begin] 增加SGSkinMaterialOutput节点 step1
+#include "Materials/MaterialExpressionSGSkinMaterialOutput.h"
+//[Toon-Pipeline][Add-End]
 #include "Materials/MaterialExpressionThinTranslucentMaterialOutput.h"
 #include "Materials/MaterialExpressionSobol.h"
 #include "Materials/MaterialExpressionSpeedTree.h"
@@ -22379,7 +22382,7 @@ FString UMaterialExpressionSingleLayerWaterMaterialOutput::GetDisplayName() cons
 //[Toon-Pipeline][Add-Begin] 增加ToonMaterialOutput节点 step2
 
 ///////////////////////////////////////////////////////////////////////////////
-// UMaterialExpressionVolumetricAdvancedMaterialOutput
+// UMaterialExpressionToonMaterialOutput
 ///////////////////////////////////////////////////////////////////////////////
 
 UMaterialExpressionToonMaterialOutput::UMaterialExpressionToonMaterialOutput(const FObjectInitializer& ObjectInitializer)
@@ -22455,6 +22458,96 @@ FString UMaterialExpressionToonMaterialOutput::GetFunctionName() const
 FString UMaterialExpressionToonMaterialOutput::GetDisplayName() const
 {
 	return TEXT("Toon Material");
+}
+//[Toon-Pipeline][Add-End]
+
+//[Toon-Pipeline][Add-Begin] 增加SGSkinMaterialOutput节点 step2
+
+///////////////////////////////////////////////////////////////////////////////
+// UMaterialExpressionSGSkinMaterialOutput
+///////////////////////////////////////////////////////////////////////////////
+
+UMaterialExpressionSGSkinMaterialOutput::UMaterialExpressionSGSkinMaterialOutput(const FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer)
+{
+	// Structure to hold one-time initialization
+	// 节点的分类
+	struct FConstructorStatics
+	{
+		FText NAME_SGSkin;
+		FConstructorStatics()
+			: NAME_SGSkin(LOCTEXT("SGSkin", "SGSkin"))
+		{
+		}
+	};
+	static FConstructorStatics ConstructorStatics;
+
+#if WITH_EDITORONLY_DATA
+	MenuCategories.Add(ConstructorStatics.NAME_SGSkin);
+#endif
+
+#if WITH_EDITOR
+	Outputs.Reset();
+#endif
+}
+
+#if WITH_EDITOR
+
+
+int32 UMaterialExpressionSGSkinMaterialOutput::Compile(class FMaterialCompiler* Compiler, int32 OutputIndex)
+{
+	int32 CodeInput = INDEX_NONE;
+
+	const bool bStrata = Strata::IsStrataEnabled();
+
+	// 这里会在BasePixelShader.usf.里生成一个获取针脚属性的函数
+	// 如获取第一个针脚的数据使用函数GetToonMaterialOutput0(MaterialParameters)
+	// Generates function names GetToonMaterialOutput{index} used in BasePixelShader.usf.
+	if (OutputIndex == 0)
+	{
+		CodeInput = Curvature.IsConnected() ? Curvature.Compile(Compiler) : Compiler->Constant3(0.f, 0.f, 0.f);
+	}
+	if (OutputIndex == 1)
+	{
+		CodeInput = CurvatureTensor.IsConnected() ? CurvatureTensor.Compile(Compiler) : Compiler->Constant3(0.f, 0.f, 0.f);
+	}
+	if (OutputIndex == 2)
+	{
+		CodeInput = NormalScale.IsConnected() ? NormalScale.Compile(Compiler) : Compiler->Constant3(0.f, 0.f, 0.f);
+	}
+	if (OutputIndex == 3)
+	{
+		CodeInput = FalloffColor.IsConnected() ? FalloffColor.Compile(Compiler) : Compiler->Constant3(0.f, 0.f, 0.f);
+	}
+	if (OutputIndex == 4)
+	{
+		CodeInput = ScatterColor.IsConnected() ? ScatterColor.Compile(Compiler) : Compiler->Constant3(0.f, 0.f, 0.f);
+	}
+	
+
+	return Compiler->CustomOutput(this, OutputIndex, CodeInput);
+}
+
+void UMaterialExpressionSGSkinMaterialOutput::GetCaption(TArray<FString>& OutCaptions) const
+{
+	OutCaptions.Add(FString(TEXT("SGSkinMaterial")));
+}
+
+#endif // WITH_EDITOR
+
+int32 UMaterialExpressionSGSkinMaterialOutput::GetNumOutputs() const
+{
+	return 3;
+}
+
+FString UMaterialExpressionSGSkinMaterialOutput::GetFunctionName() const
+{
+	return TEXT("GetSGSkinMaterialOutput");
+}
+
+FString UMaterialExpressionSGSkinMaterialOutput::GetDisplayName() const
+{
+	return TEXT("SGSkinMaterial");
 }
 //[Toon-Pipeline][Add-End]
 
