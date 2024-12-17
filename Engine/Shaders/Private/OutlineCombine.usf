@@ -16,5 +16,5 @@ void MainPS(
 	OutlineColor = Pow3(OutlineColor) * 0.3;
 	float Mask = ToonOutlineTexture.Sample(PointClampSampler, UV, 0).r;
 	//Mask = smoothstep(0.9,1,Mask);
-    OutColor = float4( lerp(OutlineColor,BaseColor,Mask),0);
+    OutColor = float4( lerp(0.0,BaseColor,Mask),0);
 }

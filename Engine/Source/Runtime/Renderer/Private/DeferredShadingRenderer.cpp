@@ -3662,7 +3662,7 @@ void FDeferredShadingSceneRenderer::Render(FRDGBuilder& GraphBuilder)
 			RenderScreenSpaceOutLinePass(GraphBuilder,SceneTextures);
 		}
 		{
-			RenderOutlineCombinePass(GraphBuilder,SceneTextures);
+			//RenderOutlineCombinePass(GraphBuilder,SceneTextures);
 		}
 		//[Toon-Pipeline][Add-End]
 		

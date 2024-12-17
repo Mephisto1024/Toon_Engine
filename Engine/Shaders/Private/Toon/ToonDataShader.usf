@@ -30,7 +30,7 @@ void MainVS(
 
 	FMaterialVertexParameters VertexParameters = GetMaterialVertexParameters(Input, VFIntermediates, WorldPos.xyz, TangentToLocal);
 	WorldPos.xyz += GetMaterialWorldPositionOffset(VertexParameters);
-	WorldPos.xyz +=WorldNormal*0.1;
+	//WorldPos.xyz +=WorldNormal*0.1;
 	
 	float4 RasterizedWorldPosition = VertexFactoryGetRasterizedWorldPosition(Input, VFIntermediates, WorldPos);
 	ClipSpacePosition = mul(RasterizedWorldPosition, ResolvedView.TranslatedWorldToClip);
