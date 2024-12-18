@@ -383,7 +383,7 @@ void ReflectionEnvironmentSkyLighting(
 		float3 SkyLighting = CloudVolumetricAOShadow * SkyLightDiffuse(GBuffer, AmbientOcclusion, BufferUV, ScreenPosition, BentNormal, DiffuseColor);
 
 		//[Toon-Pipeline][Add-Begine] 消除环境光 step1
-		if (GBuffer.ShadingModelID == SHADINGMODELID_TOON)
+		if (GBuffer.ShadingModelID == SHADINGMODELID_TOON ||GBuffer.ShadingModelID == SHADINGMODELID_TOONFACE||GBuffer.ShadingModelID == SHADINGMODELID_TOONSKIN||GBuffer.ShadingModelID == SHADINGMODELID_TOONEYE)
 		{
 			SkyLighting = float3(0.0,0.0,0.0);
 			//float3 SubsurfaceColor = ExtractSubsurfaceColor(GBuffer);

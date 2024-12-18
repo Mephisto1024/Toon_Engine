@@ -574,7 +574,10 @@ void MainPS(
 		OutAddColor = LightAccumulator_GetResult(LightAccumulator);
 		//[Toon-Pipeline][Add-Begin] 消除环境光影响 step2
 		//Lumen和SSAO
-		if (Material.GBufferData.ShadingModelID == SHADINGMODELID_TOON)
+		if (Material.GBufferData.ShadingModelID == SHADINGMODELID_TOON
+			||Material.GBufferData.ShadingModelID == SHADINGMODELID_TOONFACE
+			||Material.GBufferData.ShadingModelID == SHADINGMODELID_TOONSKIN
+			||Material.GBufferData.ShadingModelID == SHADINGMODELID_TOONEYE)
 		{
 			OutAddColor = float4(0.0f, 0.0f, 0.0f, 1.0f);
 		}

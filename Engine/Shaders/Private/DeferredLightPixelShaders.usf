@@ -340,7 +340,10 @@ void DeferredLightPixelMain(
 		
 		float4 LightAttenuation = GetLightAttenuationFromShadow(InputParams, SceneDepth);
 		//[Toon-Pipeline][Add-Begine] 添加头发投影 step2
-		if(ScreenSpaceData.GBuffer.ShadingModelID == SHADINGMODELID_TOON)
+		if(ScreenSpaceData.GBuffer.ShadingModelID == SHADINGMODELID_TOON
+			||ScreenSpaceData.GBuffer.ShadingModelID == SHADINGMODELID_TOONFACE
+			||ScreenSpaceData.GBuffer.ShadingModelID == SHADINGMODELID_TOONSKIN
+			||ScreenSpaceData.GBuffer.ShadingModelID == SHADINGMODELID_TOONEYE)
 		{
 			float HairShadow = GetHairShadow(ScreenSpaceData.GBuffer,  LightData, InputParams.ScreenUV);
 			//LightAttenuation = LightAttenuation * HairShadow;
