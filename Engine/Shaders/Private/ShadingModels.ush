@@ -375,6 +375,18 @@ FDirectLighting ToonBxDF(FGBufferData GBuffer, half3 N, half3 V, half3 L, float 
 	Lighting.Transmission = 0;
 	return Lighting;
 }
+FDirectLighting ToonFaceBxDF(FGBufferData GBuffer, half3 N, half3 V, half3 L, float Falloff, float NoL, FAreaLight AreaLight, FShadowTerms Shadow)
+{
+	return ToonBxDF(GBuffer,N,V,L,Falloff,NoL,AreaLight,Shadow);
+}
+FDirectLighting ToonSkinBxDF(FGBufferData GBuffer, half3 N, half3 V, half3 L, float Falloff, float NoL, FAreaLight AreaLight, FShadowTerms Shadow)
+{
+	return ToonBxDF(GBuffer,N,V,L,Falloff,NoL,AreaLight,Shadow);
+}
+FDirectLighting ToonEyeBxDF(FGBufferData GBuffer, half3 N, half3 V, half3 L, float Falloff, float NoL, FAreaLight AreaLight, FShadowTerms Shadow)
+{
+	return ToonBxDF(GBuffer,N,V,L,Falloff,NoL,AreaLight,Shadow);
+}
 //[Toon-Pipeline][Add-End]
 
 // Simple default lit model used by Lumen
@@ -1026,6 +1038,13 @@ FDirectLighting IntegrateBxDF( FGBufferData GBuffer, half3 N, half3 V, half3 L, 
 		//[Toon-Pipeline][Add-Begin]添加光照模型
 		case SHADINGMODELID_TOON:
 		return ToonBxDF(GBuffer, N, V, L, Falloff, NoL, AreaLight, Shadow);
+
+		case SHADINGMODELID_TOONFACE:
+		return ToonFaceBxDF(GBuffer, N, V, L, Falloff, NoL, AreaLight, Shadow);
+		case SHADINGMODELID_TOONSKIN:
+		return ToonSkinBxDF(GBuffer, N, V, L, Falloff, NoL, AreaLight, Shadow);
+		case SHADINGMODELID_TOONEYE:
+		return ToonEyeBxDF(GBuffer, N, V, L, Falloff, NoL, AreaLight, Shadow);
 		//[Toon-Pipeline][Add-End]
 		default:
 			return (FDirectLighting)0;

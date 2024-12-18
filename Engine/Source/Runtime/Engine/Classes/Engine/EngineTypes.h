@@ -639,6 +639,9 @@ enum EMaterialShadingModel : int
 	//[Sketch-Pipeline][Add-End]
 	//[Toon-Pipeline][Add-Begin]添加光照模型
 	MSM_Toon					UMETA(DisplayName = "Toon"),
+	MSM_ToonFace				UMETA(DisplayName = "ToonFace"),
+	MSM_ToonSkin				UMETA(DisplayName = "ToonSkin"),
+	MSM_ToonEye					UMETA(DisplayName = "ToonEye"),
 	//[Toon-Pipeline][Add-End]
 	/** Number of unique shading models. */
 	MSM_NUM						UMETA(Hidden),

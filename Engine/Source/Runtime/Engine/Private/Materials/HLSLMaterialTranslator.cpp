@@ -2155,6 +2155,21 @@ void FHLSLMaterialTranslator::GetMaterialEnvironment(EShaderPlatform InPlatform,
 			OutEnvironment.SetDefine(TEXT("MATERIAL_SHADINGMODEL_TOON"), TEXT("1"));
 			NumSetMaterials++;
 		}
+		if (ShadingModels.HasShadingModel(MSM_ToonFace))
+		{
+			OutEnvironment.SetDefine(TEXT("MATERIAL_SHADINGMODEL_TOONFACE"), TEXT("1"));
+			NumSetMaterials++;
+		}
+		if (ShadingModels.HasShadingModel(MSM_ToonSkin))
+		{
+			OutEnvironment.SetDefine(TEXT("MATERIAL_SHADINGMODEL_TOONSKIN"), TEXT("1"));
+			NumSetMaterials++;
+		}
+		if (ShadingModels.HasShadingModel(MSM_ToonEye))
+		{
+			OutEnvironment.SetDefine(TEXT("MATERIAL_SHADINGMODEL_TOONEYE"), TEXT("1"));
+			NumSetMaterials++;
+		}
 		//[Toon-Pipeline][Add-End]
 		if (ShadingModels.HasShadingModel(MSM_DefaultLit))
 		{

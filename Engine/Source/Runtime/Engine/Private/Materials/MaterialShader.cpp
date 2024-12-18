@@ -118,7 +118,10 @@ FString GetShadingModelString(EMaterialShadingModel ShadingModel)
 		case MSM_Sketch:			ShadingModelName = TEXT("MSM_Sketch"); break;
 		//[Sketch-Pipeline][Add-End]
 		//[Toon-Pipeline][Add-Begin]添加光照模型
-		case MSM_Toon:			ShadingModelName = TEXT("MSM_Toon"); break;
+		case MSM_Toon:				ShadingModelName = TEXT("MSM_Toon"); break;
+		case MSM_ToonFace:			ShadingModelName = TEXT("MSM_ToonFace"); break;
+		case MSM_ToonSkin:			ShadingModelName = TEXT("MSM_ToonSkin"); break;
+		case MSM_ToonEye:			ShadingModelName = TEXT("MSM_ToonEye"); break;
 		//[Toon-Pipeline][Add-End]
 		default: ShadingModelName = TEXT("Unknown"); break;
 	}
@@ -266,7 +269,10 @@ void UpdateMaterialShaderCompilingStats(const FMaterial* Material)
 		MSM_Sketch,
 		//[Sketch-Pipeline][Add-End]
 		//[Toon-Pipeline][Add-Begin]添加光照模型
-		MSM_Toon
+		MSM_Toon,
+		MSM_ToonFace,
+		MSM_ToonSkin,
+		MSM_ToonEye
 		//[Toon-Pipeline][Add-End]
 	}))
 	{

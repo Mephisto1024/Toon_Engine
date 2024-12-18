@@ -110,6 +110,10 @@ struct FShaderMaterialPropertyDefines
 	
 	//[Toon-Pipeline][Add-Begin]添加光照模型
 	uint8 MATERIAL_SHADINGMODEL_TOON : 1;
+	
+	uint8 MATERIAL_SHADINGMODEL_TOONFACE : 1;
+	uint8 MATERIAL_SHADINGMODEL_TOONSKIN : 1;
+	uint8 MATERIAL_SHADINGMODEL_TOONEYE : 1;
 	//[Toon-Pipeline][Add-End]
 	
 	uint8 TRANSLUCENCY_LIGHTING_VOLUMETRIC_NONDIRECTIONAL : 1;

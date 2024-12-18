@@ -147,6 +147,10 @@ void FShaderCompileUtilities::ApplyFetchEnvironment(FShaderMaterialPropertyDefin
 	
 	//[Toon-Pipeline][Add-Begin]添加光照模型
 	FETCH_COMPILE_BOOL(MATERIAL_SHADINGMODEL_TOON);
+
+	FETCH_COMPILE_BOOL(MATERIAL_SHADINGMODEL_TOONFACE);
+	FETCH_COMPILE_BOOL(MATERIAL_SHADINGMODEL_TOONSKIN);
+	FETCH_COMPILE_BOOL(MATERIAL_SHADINGMODEL_TOONEYE);
 	//[Toon-Pipeline][Add-End]
 	FETCH_COMPILE_BOOL(SINGLE_LAYER_WATER_SEPARATED_MAIN_LIGHT);
 
@@ -1807,6 +1811,18 @@ static void DetermineUsedMaterialSlots(
 
 	//[Toon-Pipeline][Add-Begin]添加着色模型
 	if (Mat.MATERIAL_SHADINGMODEL_TOON)
+	{
+		SetStandardGBufferSlots(Slots, bWriteEmissive, bHasTangent, bHasVelocity, bHasStaticLighting, bIsStrataMaterial);
+	}
+	if (Mat.MATERIAL_SHADINGMODEL_TOONFACE)
+	{
+		SetStandardGBufferSlots(Slots, bWriteEmissive, bHasTangent, bHasVelocity, bHasStaticLighting, bIsStrataMaterial);
+	}
+	if (Mat.MATERIAL_SHADINGMODEL_TOONSKIN)
+	{
+		SetStandardGBufferSlots(Slots, bWriteEmissive, bHasTangent, bHasVelocity, bHasStaticLighting, bIsStrataMaterial);
+	}
+	if (Mat.MATERIAL_SHADINGMODEL_TOONEYE)
 	{
 		SetStandardGBufferSlots(Slots, bWriteEmissive, bHasTangent, bHasVelocity, bHasStaticLighting, bIsStrataMaterial);
 	}
