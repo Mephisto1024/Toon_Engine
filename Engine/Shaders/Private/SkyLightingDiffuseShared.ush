@@ -137,7 +137,13 @@ float3 SkyLightDiffuse(FGBufferData GBuffer, float AmbientOcclusion, float2 Buff
 
 	//[Toon-Pipeline][Add-Begine] 消除环境光影响 step3
 	//SkyLight天光
-	Lighting = 0;
+	if (GBuffer.ShadingModelID == SHADINGMODELID_TOON
+		|| GBuffer.ShadingModelID == SHADINGMODELID_TOONFACE
+		||GBuffer.ShadingModelID == SHADINGMODELID_TOONSKIN
+		||GBuffer.ShadingModelID == SHADINGMODELID_TOONEYE)
+	{
+		Lighting = 0;
+	}
 	//[Toon-Pipeline][Add-End]
 	
 	return Lighting;
