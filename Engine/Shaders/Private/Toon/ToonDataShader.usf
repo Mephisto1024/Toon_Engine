@@ -1,4 +1,5 @@
 #include "../Common.ush"
+#include "../SceneTextureParameters.ush"
 #include "/Engine/Generated/Material.ush"
 #include "/Engine/Generated/VertexFactory.ush"
 
@@ -9,8 +10,9 @@ struct FSimpleMeshPassVSToPS
 	float4 SvPosition : SV_POSITION;
 };
 
-
-float3 InputColor;
+//Texture2D NormalTexture;
+//SamplerState PointClampSampler;
+//Texture2D SceneTexture;
 
 void MainVS(
 	FVertexFactoryInput Input,
@@ -51,7 +53,7 @@ void MainPS(
 	
 	float4 VertexColor = MaterialParameters.VertexColor;
 	float VertexColorAlpha = VertexColor.a;
-	float3 Color3 = float3(0.0, 0.0, 1.0);
+	float4 CustomData = float4(0.3, 0.7, 0.5,1.0);
 	
 	float3 OutlineColor = float3(0.0, 0.0, 0.0);
 	float OutlineThickness = VertexColorAlpha;
@@ -60,6 +62,16 @@ void MainPS(
 	float3 ShadowColor = float3(0.0, 0.0, 0.0);
 	float ShadowOffset = 0.0;
 	float4 ShadowData = float4(ShadowColor,ShadowOffset);
+
+	//GetValue
+	ResolvedView = ResolveView();
+	float2 ScreenUV = SvPositionToViewportUV(In.SvPosition);
+	
+	//float3 N = NormalTexture.Sample(PointClampSampler, ScreenUV, 0).rgb;
+	float3 N = MaterialParameters.WorldNormal;
+	float3 L = ResolvedView.AtmosphereLightDirection[0].xyz;
+	//Calculate
+	
 	
 	// FPixelMaterialInputs用于获取材质编辑器的针脚
 	// FPixelMaterialInputs PixelMaterialInputs;
@@ -70,10 +82,30 @@ void MainPS(
 	ShadowData = LWCToFloat(GetToonMaterialOutput1(MaterialParameters));
 #endif
 #ifdef  HAVE_GetToonMaterialOutput2
-	Color3 = LWCToFloat(GetToonMaterialOutput2(MaterialParameters));
+	CustomData = LWCToFloat(GetToonMaterialOutput2(MaterialParameters));
 #endif
-	
+
+	//Face
+	float3 FaceForwardVector = float3(0.f,1.f,0.f);
+	float3 FaceRightVector = float3(1.f,0.f,0.f);
+#ifdef  HAVE_GetToonFaceMaterialOutput0
+	OutlineData = LWCToFloat(GetToonFaceMaterialOutput0(MaterialParameters));
+#endif
+#ifdef  HAVE_GetToonFaceMaterialOutput1
+	ShadowData = LWCToFloat(GetToonFaceMaterialOutput1(MaterialParameters));
+#endif
+#ifdef  HAVE_GetToonFaceMaterialOutput2
+	FaceForwardVector = LWCToFloat(GetToonFaceMaterialOutput2(MaterialParameters));
+#endif
+#ifdef  HAVE_GetToonFaceMaterialOutput3
+	FaceRightVector = LWCToFloat(GetToonFaceMaterialOutput3(MaterialParameters));
+#endif
+#ifdef  HAVE_GetToonFaceMaterialOutput4
+	CustomData = LWCToFloat(GetToonFaceMaterialOutput4(MaterialParameters));
+#endif
+
+	CustomData.xyz = N;
 	OutToonOutlineData = OutlineData;
 	OutToonShadowData = ShadowData;
-	OutToonCustomData = ShadowData;
+	OutToonCustomData = CustomData;
 }

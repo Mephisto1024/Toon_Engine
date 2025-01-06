@@ -303,6 +303,7 @@
 #include "Materials/MaterialInstanceConstant.h"
 #include "Curves/CurveLinearColorAtlas.h"
 #include "Curves/CurveLinearColor.h"
+#include "Materials/MaterialExpressionToonFaceMaterialOutput.h"
 
 #define LOCTEXT_NAMESPACE "MaterialExpression"
 
@@ -22382,7 +22383,7 @@ FString UMaterialExpressionSingleLayerWaterMaterialOutput::GetDisplayName() cons
 //[Toon-Pipeline][Add-Begin] 增加ToonMaterialOutput节点 step2
 
 ///////////////////////////////////////////////////////////////////////////////
-// UMaterialExpressionToonMaterialOutput
+// Toon MaterialOutput
 ///////////////////////////////////////////////////////////////////////////////
 
 UMaterialExpressionToonMaterialOutput::UMaterialExpressionToonMaterialOutput(const FObjectInitializer& ObjectInitializer)
@@ -22423,15 +22424,15 @@ int32 UMaterialExpressionToonMaterialOutput::Compile(class FMaterialCompiler* Co
 	// Generates function names GetToonMaterialOutput{index} used in BasePixelShader.usf.
 	if (OutputIndex == 0)
 	{
-		CodeInput = ToonOutlineData.IsConnected() ? ToonOutlineData.Compile(Compiler) : Compiler->Constant3(0.f, 0.f, 0.f);
+		CodeInput = ToonOutlineData.IsConnected() ? ToonOutlineData.Compile(Compiler) : Compiler->Constant4(0.f, 0.f, 0.f, 0.f);
 	}
 	if (OutputIndex == 1)
 	{
-		CodeInput = ToonShadowData.IsConnected() ? ToonShadowData.Compile(Compiler) : Compiler->Constant3(0.f, 0.f, 0.f);
+		CodeInput = ToonShadowData.IsConnected() ? ToonShadowData.Compile(Compiler) : Compiler->Constant4(0.f, 0.f, 0.f, 0.f);
 	}
 	if (OutputIndex == 2)
 	{
-		CodeInput = ToonDataC.IsConnected() ? ToonDataC.Compile(Compiler) : Compiler->Constant3(0.f, 0.f, 0.f);
+		CodeInput = ToonDataC.IsConnected() ? ToonDataC.Compile(Compiler) : Compiler->Constant4(0.f, 0.f, 0.f, 0.f);
 	}
 	
 
@@ -22458,6 +22459,91 @@ FString UMaterialExpressionToonMaterialOutput::GetFunctionName() const
 FString UMaterialExpressionToonMaterialOutput::GetDisplayName() const
 {
 	return TEXT("Toon Material");
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// ToonFace MaterialOutput
+///////////////////////////////////////////////////////////////////////////////
+
+UMaterialExpressionToonFaceMaterialOutput::UMaterialExpressionToonFaceMaterialOutput(const FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer)
+{
+	// Structure to hold one-time initialization
+	// 节点的分类
+	struct FConstructorStatics
+	{
+		FText NAME_ToonFace;
+		FConstructorStatics()
+			: NAME_ToonFace(LOCTEXT("Toon", "Toon"))
+		{
+		}
+	};
+	static FConstructorStatics ConstructorStatics;
+
+#if WITH_EDITORONLY_DATA
+	MenuCategories.Add(ConstructorStatics.NAME_ToonFace);
+#endif
+
+#if WITH_EDITOR
+	Outputs.Reset();
+#endif
+}
+
+#if WITH_EDITOR
+
+
+int32 UMaterialExpressionToonFaceMaterialOutput::Compile(class FMaterialCompiler* Compiler, int32 OutputIndex)
+{
+	int32 CodeInput = INDEX_NONE;
+	
+	// 这里会在BasePixelShader.usf.里生成一个获取针脚属性的函数
+	// 如获取第一个针脚的数据使用函数GetToonMaterialOutput0(MaterialParameters)
+	// Generates function names GetToonMaterialOutput{index} used in BasePixelShader.usf.
+	if (OutputIndex == 0)
+	{
+		CodeInput = ToonOutlineData.IsConnected() ? ToonOutlineData.Compile(Compiler) : Compiler->Constant4(0.f, 0.f, 0.f, 0.f);
+	}
+	if (OutputIndex == 1)
+	{
+		CodeInput = ToonShadowDataSDF.IsConnected() ? ToonShadowDataSDF.Compile(Compiler) : Compiler->Constant4(0.f, 0.f, 0.f, 0.f);
+	}
+	if (OutputIndex == 2)
+	{
+		CodeInput = FaceForwardVector.IsConnected() ? FaceForwardVector.Compile(Compiler) : Compiler->Constant3(0.f, 0.f, 0.f);
+	}
+	if (OutputIndex == 3)
+	{
+		CodeInput = FaceRightVector.IsConnected() ? FaceRightVector.Compile(Compiler) : Compiler->Constant3(0.f, 0.f, 0.f);
+	}
+	if (OutputIndex == 4)
+	{
+		CodeInput = ToonDataC.IsConnected() ? ToonDataC.Compile(Compiler) : Compiler->Constant4(0.f, 0.f, 0.f, 0.f);
+	}
+	
+
+	return Compiler->CustomOutput(this, OutputIndex, CodeInput);
+}
+
+void UMaterialExpressionToonFaceMaterialOutput::GetCaption(TArray<FString>& OutCaptions) const
+{
+	OutCaptions.Add(FString(TEXT("ToonFace Material")));
+}
+
+#endif // WITH_EDITOR
+
+int32 UMaterialExpressionToonFaceMaterialOutput::GetNumOutputs() const
+{
+	return 5;
+}
+
+FString UMaterialExpressionToonFaceMaterialOutput::GetFunctionName() const
+{
+	return TEXT("GetToonFaceMaterialOutput");
+}
+
+FString UMaterialExpressionToonFaceMaterialOutput::GetDisplayName() const
+{
+	return TEXT("ToonFace Material");
 }
 //[Toon-Pipeline][Add-End]
 
@@ -22537,7 +22623,7 @@ void UMaterialExpressionSGSkinMaterialOutput::GetCaption(TArray<FString>& OutCap
 
 int32 UMaterialExpressionSGSkinMaterialOutput::GetNumOutputs() const
 {
-	return 3;
+	return 5;
 }
 
 FString UMaterialExpressionSGSkinMaterialOutput::GetFunctionName() const

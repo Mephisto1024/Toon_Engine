@@ -4,6 +4,8 @@
 #include "MeshPassProcessor.h"
 
 #include "MeshMaterialShader.h"
+#include "RenderGraphResources.h"
+#include "SceneTexturesConfig.h"
 
 class FToonPassVS : public FMeshMaterialShader
 {
@@ -54,7 +56,9 @@ public:
         : FMeshMaterialShader(Initializer)
     {
         // 这个用于绑定shader的参数InputColor，虽然shader中没有使用
-        InputColor.Bind(Initializer.ParameterMap, TEXT("InputColor"));
+        //NormalTexture.Bind(Initializer.ParameterMap, TEXT("NormalTexture"));
+    	//PointClampSampler.Bind(Initializer.ParameterMap, TEXT("PointClampSampler"));
+
     }
 
     static void ModifyCompilationEnvironment(const FMaterialShaderPermutationParameters& Parameters, FShaderCompilerEnvironment& OutEnvironment)
@@ -78,13 +82,12 @@ public:
         FMeshDrawSingleShaderBindings& ShaderBindings) const
     {
         FMeshMaterialShader::GetShaderBindings(Scene, FeatureLevel, PrimitiveSceneProxy, MaterialRenderProxy, Material, DrawRenderState, ShaderElementData, ShaderBindings);
-
-        FVector3f Color(1.0, 0.0, 0.0);
-
-        ShaderBindings.Add(InputColor, Color);
+    	
+    	//ShaderBindings.AddTexture(NormalTexture, PointClampSampler, nullptr,nullptr);
     }
 
-    LAYOUT_FIELD(FShaderParameter, InputColor);
+    //LAYOUT_FIELD(FShaderResourceParameter, NormalTexture);
+	//LAYOUT_FIELD(FShaderResourceParameter, PointClampSampler);
 };
 
 class FToonPassMeshProcessor : public FMeshPassProcessor

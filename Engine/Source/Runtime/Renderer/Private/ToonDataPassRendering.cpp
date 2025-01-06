@@ -46,7 +46,10 @@ void FToonPassMeshProcessor::AddMeshBatch(
     {
     	const FMaterialShadingModelField ShadingModels = Material->GetShadingModels();
     	// 只有材质使用了Toon相关的shading model才会被绘制
-	    if (ShadingModels.HasShadingModel(MSM_Toon))
+	    if (ShadingModels.HasShadingModel(MSM_Toon)
+	    	|| ShadingModels.HasShadingModel(MSM_ToonFace)
+	    	|| ShadingModels.HasShadingModel(MSM_ToonSkin)
+	    	|| ShadingModels.HasShadingModel(MSM_ToonEye))
 	    {
 	    	const EBlendMode BlendMode = Material->GetBlendMode();
 	    	bool bResult = true;
@@ -133,13 +136,18 @@ DECLARE_CYCLE_STAT(TEXT("ToonDataPass"), STAT_CLP_ToonDataPass, STATGROUP_Parall
 BEGIN_SHADER_PARAMETER_STRUCT(FToonMeshPassParameters, )
     SHADER_PARAMETER_STRUCT_REF(FViewUniformShaderParameters, View)
     SHADER_PARAMETER_STRUCT_INCLUDE(FInstanceCullingDrawParams, InstanceCullingDrawParams)
+	//SHADER_PARAMETER_STRUCT_INCLUDE(FSceneTextureShaderParameters, SceneTextures)
+	//SHADER_PARAMETER_RDG_TEXTURE(Texture2D, NormalTexture)
+	//SHADER_PARAMETER_SAMPLER(SamplerState, PointClampSampler)
     RENDER_TARGET_BINDING_SLOTS()
 END_SHADER_PARAMETER_STRUCT()
 FToonMeshPassParameters* GetToonPassParameters(FRDGBuilder& GraphBuilder, const FViewInfo& View, FSceneTextures& SceneTextures)
 {
     FToonMeshPassParameters* PassParameters = GraphBuilder.AllocParameters<FToonMeshPassParameters>();
     PassParameters->View = View.ViewUniformBuffer;
-	
+	//PassParameters->NormalTexture = SceneTextures.GBufferA;
+	//PassParameters->PointClampSampler = TStaticSamplerState<SF_Point>::GetRHI();
+	//PassParameters->SceneTextures = SceneTextures.GetSceneTextureShaderParameters(View.GetFeatureLevel());
 	if (!HasBeenProduced(SceneTextures.ToonOutlineData))
 	{
 		// 如果ToonBuffer没被创建，在这里创建
